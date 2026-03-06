@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UV-VIS Spectroscopy Lab · CAPE Chemistry</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f0f2f6;--surface:#ffffff;--surface2:#e8ecf2;--surface3:#dde3ec;
+  --border:#c5cdd9;--text:#1a2030;--text2:#4a5470;--text3:#7a85a0;
+  --accent:#1565c0;--accent2:#0097a7;--accent-glow:rgba(21,101,192,0.15);
+  --instrument:#1c2233;--instrument2:#252d3f;--instrument3:#2e3850;
+  --led:#00e5ff;--led2:#76ff03;--amber:#ffd600;--danger:#f44336;
+  --green:#00c853;--purple:#7c3aed;
+  --shadow:0 2px 8px rgba(0,0,0,0.1);--shadow-lg:0 8px 32px rgba(0,0,0,0.15);
+  --radius:8px;--radius-lg:12px;
+}
+[data-theme="dark"]{
+  --bg:#0a0e1a;--surface:#111827;--surface2:#1a2035;--surface3:#222d45;
+  --border:#2a3550;--text:#e2e8f8;--text2:#8896b8;--text3:#4a5680;
+  --accent:#4da6ff;--accent2:#00e5ff;--accent-glow:rgba(77,166,255,0.12);
+  --shadow:0 2px 8px rgba(0,0,0,0.4);--shadow-lg:0 8px 32px rgba(0,0,0,0.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;transition:background .3s,color .3s}
+
+/* ─── HEADER ─── */
+header{background:var(--instrument);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:56px;position:sticky;top:0;z-index:100;border-bottom:1px solid #ffffff10;box-shadow:0 2px 16px rgba(0,0,0,0.4)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:linear-gradient(135deg,#1565c0,#0097a7);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.logo-text{font-family:'IBM Plex Mono',monospace;font-weight:500;font-size:13px;letter-spacing:.05em}
+.logo-sub{color:#8896b8;font-size:11px;font-family:'DM Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.header-right{display:flex;align-items:center;gap:12px}
+.badge{background:rgba(0,229,255,.15);color:#00e5ff;border:1px solid rgba(0,229,255,.3);border-radius:4px;padding:2px 8px;font-size:10px;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
+.theme-btn{background:none;border:1px solid #ffffff25;color:#fff;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:12px;display:flex;align-items:center;gap:6px;transition:all .2s}
+.theme-btn:hover{background:#ffffff15;border-color:#ffffff40}
+
+/* ─── TABS ─── */
+.tab-nav{background:var(--instrument);display:flex;padding:0 24px;border-bottom:2px solid var(--border)}
+.tab-btn{background:none;border:none;color:#8896b8;padding:14px 20px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:500;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .2s;letter-spacing:.01em}
+.tab-btn:hover{color:#c0cbdf}
+.tab-btn.active{color:#4da6ff;border-bottom-color:#4da6ff}
+
+/* ─── TAB CONTENT ─── */
+.tab-content{display:none;padding:24px;max-width:1400px;margin:0 auto;animation:fadeIn .25s ease}
+.tab-content.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── NOTES SECTION ─── */
+.notes-header{margin-bottom:24px}
+.notes-header h1{font-family:'Libre Baskerville',serif;font-size:22px;font-weight:700;color:var(--text);margin-bottom:6px}
+.notes-header p{color:var(--text2);font-size:13.5px;line-height:1.6}
+.notes-grid{display:grid;grid-template-columns:1fr;gap:12px}
+.collapsible{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:box-shadow .2s}
+.collapsible:hover{box-shadow:var(--shadow)}
+.coll-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;transition:background .15s}
+.coll-header:hover{background:var(--surface2)}
+.coll-title{display:flex;align-items:center;gap:12px}
+.coll-badge{background:var(--accent);color:#fff;border-radius:6px;padding:3px 10px;font-size:11px;font-family:'IBM Plex Mono',monospace;font-weight:500;white-space:nowrap}
+.coll-label{font-size:14.5px;font-weight:600;color:var(--text)}
+.coll-arrow{color:var(--text3);font-size:12px;transition:transform .25s;flex-shrink:0}
+.collapsible.open .coll-arrow{transform:rotate(180deg)}
+.coll-body{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(0.4,0,0.2,1)}
+.collapsible.open .coll-body{max-height:3000px}
+.coll-inner{padding:20px 20px 24px;border-top:1px solid var(--border)}
+/* Notes typography */
+.note-h3{font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--text);margin:20px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--accent);display:inline-block}
+.note-h3:first-child{margin-top:0}
+.note-p{font-family:'Libre Baskerville',serif;font-size:13.5px;line-height:1.85;color:var(--text);margin-bottom:10px}
+.note-eq{background:var(--surface2);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:10px 16px;font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--text);margin:12px 0;letter-spacing:.02em}
+.note-table{width:100%;border-collapse:collapse;margin:12px 0;font-size:12.5px}
+.note-table th{background:var(--surface2);padding:8px 12px;text-align:left;border:1px solid var(--border);font-weight:600;color:var(--text2)}
+.note-table td{padding:7px 12px;border:1px solid var(--border);color:var(--text);font-family:'Libre Baskerville',serif;font-size:12.5px;line-height:1.5}
+.note-table tr:hover td{background:var(--surface2)}
+.key-box{background:linear-gradient(135deg,var(--accent-glow),transparent);border:1px solid var(--accent);border-radius:var(--radius);padding:12px 16px;margin:14px 0}
+.key-box h4{color:var(--accent);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;font-family:'DM Sans',sans-serif;font-weight:600}
+.key-box ul{list-style:none;padding:0}
+.key-box ul li{font-family:'Libre Baskerville',serif;font-size:12.5px;line-height:1.7;padding:2px 0 2px 14px;position:relative;color:var(--text)}
+.key-box ul li::before{content:'◦';position:absolute;left:0;color:var(--accent);font-size:10px;top:3px}
+.did-know{background:rgba(0,151,167,.08);border:1px solid rgba(0,151,167,.3);border-radius:var(--radius);padding:12px 16px;margin:14px 0}
+.did-know h4{color:var(--accent2);font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;font-family:'DM Sans',sans-serif;font-weight:600}
+.did-know p{font-family:'Libre Baskerville',serif;font-size:12.5px;line-height:1.7;color:var(--text)}
+.note-list{list-style:none;padding:0;margin:8px 0}
+.note-list li{font-family:'Libre Baskerville',serif;font-size:13px;line-height:1.75;padding:3px 0 3px 18px;position:relative;color:var(--text)}
+.note-list li::before{content:'→';position:absolute;left:0;color:var(--accent2);font-size:11px;top:5px}
+.transition-img{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.t-box{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;text-align:center;flex:1;min-width:120px}
+.t-box .t-label{font-size:11px;color:var(--text3);font-family:'IBM Plex Mono',monospace;margin-bottom:4px}
+.t-box .t-name{font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px}
+.t-box .t-range{font-size:11px;color:var(--accent2);font-family:'IBM Plex Mono',monospace}
+.t-box .t-energy{font-size:10px;color:var(--text3);margin-top:2px}
+
+/* ─── SIMULATOR ─── */
+.sim-layout{display:grid;grid-template-columns:260px 1fr 220px;gap:16px;min-height:480px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px}
+.panel h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:14px;font-weight:600}
+/* Controls */
+.ctrl-group{margin-bottom:14px}
+.ctrl-label{font-size:11.5px;color:var(--text2);margin-bottom:5px;display:flex;justify-content:space-between;align-items:center}
+.ctrl-val{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--accent);font-weight:500}
+select,input[type=range]{width:100%}
+select{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:7px 10px;font-size:12.5px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238896b8'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+select:focus{border-color:var(--accent)}
+input[type=range]{appearance:none;height:4px;background:var(--surface3);border-radius:2px;outline:none;cursor:pointer;margin-top:2px}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 4px rgba(21,101,192,.5)}
+.power-btn{width:100%;padding:10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12.5px;font-weight:600;transition:all .2s;color:var(--text2)}
+.power-btn.on{background:rgba(0,200,83,.12);border-color:#00c853;color:#00c853}
+.power-dot{width:8px;height:8px;border-radius:50%;background:var(--text3);transition:all .2s}
+.power-btn.on .power-dot{background:#00c853;box-shadow:0 0 6px #00c853}
+/* Instrument canvas area */
+.instrument-wrap{background:var(--instrument);border-radius:var(--radius-lg);padding:12px;overflow:hidden}
+.instrument-label{font-size:10px;color:#4a5680;text-transform:uppercase;letter-spacing:.1em;font-family:'IBM Plex Mono',monospace;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.inst-dot{width:6px;height:6px;border-radius:50%;background:var(--led2);box-shadow:0 0 6px var(--led2);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+canvas{display:block;border-radius:6px}
+.spectrum-wrap{background:var(--instrument);border-radius:var(--radius);padding:10px;margin-top:12px}
+.spectrum-label{font-size:10px;color:#4a5680;font-family:'IBM Plex Mono',monospace;letter-spacing:.08em;text-transform:uppercase;margin-bottom:6px}
+/* Readings panel */
+.reading-display{background:var(--instrument);border-radius:var(--radius);padding:14px;margin-bottom:12px;border:1px solid #2a3550}
+.reading-title{font-size:10px;color:#4a5680;font-family:'IBM Plex Mono',monospace;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.reading-value{font-family:'IBM Plex Mono',monospace;font-size:28px;font-weight:300;color:var(--led);line-height:1;margin-bottom:2px;letter-spacing:.02em}
+.reading-value.transmit{color:var(--led2)}
+.reading-unit{font-size:10px;color:#4a5680;font-family:'IBM Plex Mono',monospace;letter-spacing:.06em}
+.capture-btn{width:100%;padding:10px;background:var(--accent);color:#fff;border:none;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;margin-bottom:8px;transition:all .2s;font-family:'DM Sans',sans-serif;letter-spacing:.02em}
+.capture-btn:hover{filter:brightness(1.1);transform:translateY(-1px);box-shadow:0 4px 12px var(--accent-glow)}
+.capture-btn:active{transform:translateY(0)}
+.export-btn{width:100%;padding:8px;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.export-btn:hover{background:var(--surface3);border-color:var(--accent)}
+.substance-info{background:var(--surface2);border-radius:var(--radius);padding:10px 12px;font-size:11.5px;line-height:1.6;color:var(--text2);border-left:3px solid var(--accent2)}
+/* Data Table */
+.data-section{margin-top:20px}
+.data-section h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;font-weight:600}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg)}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead tr{background:var(--surface2)}
+th{padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);font-weight:600;border-bottom:1px solid var(--border)}
+td{padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--surface2);color:var(--text)}
+td.mono{font-family:'IBM Plex Mono',monospace;font-size:12px}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+.del-btn{background:none;border:1px solid transparent;border-radius:4px;padding:3px 8px;cursor:pointer;color:var(--text3);font-size:11px;transition:all .15s}
+.del-btn:hover{border-color:var(--danger);color:var(--danger);background:rgba(244,67,54,.08)}
+.empty-msg{text-align:center;padding:28px;color:var(--text3);font-size:13px;font-style:italic}
+.tbl-actions{display:flex;gap:8px;margin-bottom:10px}
+.sm-btn{padding:6px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;color:var(--text);transition:all .2s;font-family:'DM Sans',sans-serif}
+.sm-btn:hover{background:var(--surface2);border-color:var(--accent);color:var(--accent)}
+.sm-btn.danger:hover{border-color:var(--danger);color:var(--danger);background:rgba(244,67,54,.06)}
+
+/* ─── CALIBRATION CURVE ─── */
+.cal-layout{display:grid;grid-template-columns:220px 1fr;gap:16px}
+.cal-config h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:14px;font-weight:600}
+.cfg-group{margin-bottom:12px}
+.cfg-label{font-size:11.5px;color:var(--text2);margin-bottom:4px;display:block}
+.cfg-input{width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:6px 10px;font-size:12px;outline:none;font-family:'IBM Plex Mono',monospace}
+.cfg-input:focus{border-color:var(--accent)}
+.cfg-row{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;margin:8px 0}
+.toggle-label{font-size:12px;color:var(--text2)}
+.toggle{position:relative;width:36px;height:20px;cursor:pointer}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-track{position:absolute;inset:0;background:var(--surface3);border-radius:10px;transition:.2s;border:1px solid var(--border)}
+.toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
+.toggle-track::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.toggle input:checked+.toggle-track::after{left:18px}
+.cal-canvas-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column}
+.cal-canvas-wrap h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+#calCanvas{border-radius:6px;cursor:crosshair;width:100%;background:#ffffff}
+.stat-box{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.stat-item{background:var(--surface2);border-radius:6px;padding:8px 12px;text-align:center}
+.stat-val{font-family:'IBM Plex Mono',monospace;font-size:15px;font-weight:500;color:var(--accent);margin-bottom:2px}
+.stat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em}
+.filter-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+.filter-chip{padding:4px 12px;border-radius:20px;border:1px solid var(--border);font-size:11.5px;cursor:pointer;background:var(--surface2);color:var(--text2);transition:all .2s}
+.filter-chip.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:900px){
+  .sim-layout{grid-template-columns:1fr;grid-template-rows:auto auto auto}
+  .cal-layout{grid-template-columns:1fr}
+  .tab-btn{padding:12px 14px;font-size:12.5px}
+}
+@media(max-width:600px){
+  .tab-content{padding:12px}
+  header{padding:0 16px}
+}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text3)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚗️</div>
+    <div>
+      <div class="logo-text">UV-VIS Spectroscopy Lab</div>
+      <div class="logo-sub">CAPE Chemistry · Unit 2 Module 2</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <span class="badge">Interactive</span>
+    <button class="theme-btn" id="themeBtn">🌙 Dark</button>
+  </div>
+</header>
+
+<div class="tab-nav">
+  <button class="tab-btn active" data-tab="notes">📖 Notes</button>
+  <button class="tab-btn" data-tab="simulator">🔬 Simulator</button>
+  <button class="tab-btn" data-tab="calibration">📈 Calibration Curve</button>
+</div>
+
+<!-- ══════════════════════════════════════════ NOTES TAB ══════════════════════════════════════════ -->
+<div id="tab-notes" class="tab-content active">
+  <div class="notes-header">
+    <h1>UV-VIS Spectroscopy — Study Notes</h1>
+    <p>Comprehensive notes aligned to CAPE Chemistry Objectives 5.1 – 5.5. Click any section to expand.</p>
+  </div>
+  <div class="notes-grid">
+
+    <!-- 5.1 -->
+    <div class="collapsible open" id="coll-51">
+      <div class="coll-header" onclick="toggleColl('coll-51')">
+        <div class="coll-title">
+          <span class="coll-badge">5.1</span>
+          <span class="coll-label">Origin of Absorption in UV/VIS Spectroscopy</span>
+        </div>
+        <span class="coll-arrow">▼</span>
+      </div>
+      <div class="coll-body">
+        <div class="coll-inner">
+          <h3 class="note-h3">Electromagnetic Radiation and Energy</h3>
+          <p class="note-p">UV/VIS spectroscopy is based on the <strong>electronic excitation</strong> of molecules. When a molecule absorbs electromagnetic radiation in the ultraviolet (200–400 nm) or visible (400–800 nm) region, the energy supplied is used to promote an electron from a lower-energy occupied molecular orbital to a higher-energy unoccupied (antibonding) orbital.</p>
+          <div class="note-eq">ΔE = hν = hc/λ &nbsp;where h = 6.63 × 10⁻³⁴ J s, c = 3.00 × 10⁸ m s⁻¹</div>
+          <p class="note-p">The wavelength absorbed corresponds exactly to the energy gap between orbitals: <em>shorter wavelength → higher energy → larger orbital energy gap.</em></p>
+
+          <h3 class="note-h3">Molecular Orbitals Involved</h3>
+          <p class="note-p">When two atomic orbitals overlap, they form two molecular orbitals. In UV/VIS spectroscopy we are concerned with the following orbital types:</p>
+          <div class="transition-img">
+            <div class="t-box"><div class="t-label">Bonding</div><div class="t-name">σ (sigma)</div><div class="t-range">formed by head-on overlap</div></div>
+            <div class="t-box"><div class="t-label">Bonding</div><div class="t-name">π (pi)</div><div class="t-range">formed by side-on overlap</div></div>
+            <div class="t-box"><div class="t-label">Non-bonding</div><div class="t-name">n</div><div class="t-range">lone pairs, not in bond</div></div>
+            <div class="t-box" style="border-color:var(--danger)"><div class="t-label">Anti-bonding</div><div class="t-name">σ* (sigma star)</div><div class="t-range">higher energy</div></div>
+            <div class="t-box" style="border-color:var(--accent)"><div class="t-label">Anti-bonding</div><div class="t-name">π* (pi star)</div><div class="t-range">higher energy</div></div>
+          </div>
+          <p class="note-p">Energy order (lowest → highest): σ &lt; π &lt; n &lt; π* &lt; σ*</p>
+
+          <h3 class="note-h3">Electronic Transitions</h3>
+          <p class="note-p">Six possible electronic transitions occur in UV/VIS spectroscopy, but only four are relevant to the ordinary UV/VIS range (200–800 nm):</p>
+          <table class="note-table">
+            <thead><tr><th>Transition</th><th>Typical λ Range</th><th>Energy Required</th><th>Compounds</th></tr></thead>
+            <tbody>
+              <tr><td>σ → σ*</td><td>&lt; 150 nm (far UV)</td><td>Very High</td><td>Saturated alkanes (not accessible)</td></tr>
+              <tr><td>π → π*</td><td>170–250 nm</td><td>High</td><td>Alkenes, conjugated dienes, aromatics</td></tr>
+              <tr><td>n → σ*</td><td>180–250 nm</td><td>Moderate–High</td><td>Alcohols, ethers, amines, halides</td></tr>
+              <tr><td>n → π*</td><td>250–400 nm</td><td>Moderate</td><td>Carbonyls (C=O), azo groups</td></tr>
+              <tr><td>d–d transitions</td><td>400–800 nm</td><td>Low–Moderate</td><td>Transition metal aquo-complexes</td></tr>
+              <tr><td>Charge-transfer</td><td>Varies widely</td><td>Variable</td><td>Metal–ligand complexes (intense)</td></tr>
+            </tbody>
+          </table>
+          <div class="key-box">
+            <h4>Key Points</h4>
+            <ul>
+              <li>The σ → σ* transition requires so much energy it falls in the far UV (&lt; 150 nm), outside the range of ordinary spectrophotometers. Saturated compounds like alkanes cannot therefore be analysed by routine UV spectroscopy.</li>
+              <li>The n → π* transition requires the least energy and gives absorption at longest wavelengths (least energetic photons).</li>
+              <li>When UV/VIS radiation passes through a sample, only photons whose energy exactly equals ΔE for a transition are absorbed.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5.2 -->
+    <div class="collapsible" id="coll-52">
+      <div class="coll-header" onclick="toggleColl('coll-52')">
+        <div class="coll-title">
+          <span class="coll-badge">5.2</span>
+          <span class="coll-label">Why Some Species Absorb UV/VIS Radiation and Others Do Not</span>
+        </div>
+        <span class="coll-arrow">▼</span>
+      </div>
+      <div class="coll-body">
+        <div class="coll-inner">
+          <h3 class="note-h3">Chromophores</h3>
+          <p class="note-p">A <strong>chromophore</strong> is the part of a molecule responsible for absorbing UV/VIS radiation. For a molecule to absorb, it must contain a chromophore — a group that provides accessible energy levels in the UV/VIS range.</p>
+
+          <h3 class="note-h3">Organic Molecules: Conjugated Systems</h3>
+          <p class="note-p">Organic molecules with <strong>conjugated π systems</strong> (alternating double and single bonds) absorb UV/VIS radiation due to π → π* transitions. As the degree of conjugation increases, the energy gap between HOMO and LUMO decreases, shifting absorption to <em>longer wavelengths</em> (bathochromic / red shift).</p>
+          <table class="note-table">
+            <thead><tr><th>Compound</th><th>Double Bonds</th><th>λmax (nm)</th><th>Region</th></tr></thead>
+            <tbody>
+              <tr><td>Ethene (CH₂=CH₂)</td><td>1</td><td>171</td><td>Far UV</td></tr>
+              <tr><td>Buta-1,3-diene (conjugated)</td><td>2</td><td>217</td><td>UV</td></tr>
+              <tr><td>Hexa-1,3,5-triene</td><td>3</td><td>258</td><td>UV</td></tr>
+              <tr><td>β-Carotene (11 conjugated)</td><td>11</td><td>454</td><td>Visible (absorbs violet/blue)</td></tr>
+            </tbody>
+          </table>
+          <p class="note-p">Carbonyl groups (C=O) in aldehydes and ketones exhibit both π → π* (strong, ~190 nm) and n → π* (weak, ~270 nm) transitions. The n → π* band in butanone appears near 275 nm.</p>
+
+          <h3 class="note-h3">Transition Metal Ions: d-d Transitions</h3>
+          <p class="note-p">In isolated transition metal ions, the five d orbitals are <strong>degenerate</strong> (same energy). When ligands surround the metal ion, the d orbitals split into two groups of different energy. An electron can be promoted from the lower d group to the higher d group by absorbing visible light energy. The wavelength absorbed (and thus the colour observed) depends on the <strong>energy difference between the split d levels</strong>, which in turn depends on the ligand and the metal.</p>
+          <div class="did-know">
+            <h4>Did You Know?</h4>
+            <p>Dilute CuSO₄ solution appears light blue because [Cu(H₂O)₆]²⁺ absorbs in the red-orange region (~810 nm). When ammonia is added, the complex [Cu(NH₃)₄]²⁺ forms, which has a larger ligand field splitting — absorbing in the yellow-red region (~620 nm) — appearing deep blue.</p>
+          </div>
+
+          <h3 class="note-h3">Species That Do NOT Absorb UV/VIS</h3>
+          <ul class="note-list">
+            <li>Saturated alkanes (only σ bonds; σ → σ* needs far UV &lt; 150 nm)</li>
+            <li>Water and most simple inorganic ions (no accessible electronic transitions)</li>
+            <li>Noble gases (no bonds, no valence electrons to promote)</li>
+            <li>Colourless simple salts (e.g., NaCl, KNO₃ — absorption only in far UV)</li>
+          </ul>
+          <div class="key-box">
+            <h4>Summary</h4>
+            <ul>
+              <li>UV absorption: organic molecules with conjugated π systems or C=O groups (π→π*, n→π* transitions)</li>
+              <li>Visible absorption: transition metal complexes (d-d transitions) or highly conjugated organic dyes</li>
+              <li>No UV/VIS absorption: saturated compounds with only σ bonds</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5.3 -->
+    <div class="collapsible" id="coll-53">
+      <div class="coll-header" onclick="toggleColl('coll-53')">
+        <div class="coll-title">
+          <span class="coll-badge">5.3</span>
+          <span class="coll-label">Basic Steps in Analysing Samples by UV/VIS Spectroscopy</span>
+        </div>
+        <span class="coll-arrow">▼</span>
+      </div>
+      <div class="coll-body">
+        <div class="coll-inner">
+          <h3 class="note-h3">Procedure for Visible Spectrophotometry</h3>
+          <ul class="note-list">
+            <li><strong>Step 1 – Sample preparation:</strong> Dissolve the sample in an appropriate solvent (distilled water, ethanol, etc.) to form a clear solution. Dilute if necessary.</li>
+            <li><strong>Step 2 – Select wavelength:</strong> Set the spectrophotometer to the wavelength of maximum absorption (λmax) of the analyte. This maximises sensitivity.</li>
+            <li><strong>Step 3 – Zero the instrument:</strong> Place a <em>blank</em> (cuvette containing pure solvent only) in the light path. Set the absorbance to 0 (transmittance to 100%). This accounts for solvent absorption and reflection losses.</li>
+            <li><strong>Step 4 – Measure the sample:</strong> Replace the blank with the sample cuvette. Record the absorbance (A) or %T from the digital display.</li>
+            <li><strong>Step 5 – Repeat at other wavelengths</strong> (if scanning a full spectrum): repeat steps 3–4 for each wavelength.</li>
+            <li><strong>Step 6 – Calibration:</strong> Measure standard solutions of known concentration to construct a calibration curve (A vs c).</li>
+          </ul>
+
+          <h3 class="note-h3">Using Complexing Reagents</h3>
+          <p class="note-p">Many ions in solution are either colourless or only faintly coloured, making direct visible spectroscopy impractical. A <strong>complexing reagent (chromophoric reagent)</strong> is added to react with the analyte and form a more intensely coloured compound, increasing sensitivity.</p>
+          <table class="note-table">
+            <thead><tr><th>Analyte</th><th>Complexing Reagent</th><th>Product Colour</th><th>λmax (nm)</th><th>ε (M⁻¹cm⁻¹)</th></tr></thead>
+            <tbody>
+              <tr><td>Fe²⁺ (iron)</td><td>1,10-phenanthroline</td><td>Orange-red</td><td>510</td><td>11,100</td></tr>
+              <tr><td>Cu²⁺ (copper)</td><td>NH₃ (ammonia)</td><td>Deep blue</td><td>620</td><td>~50</td></tr>
+              <tr><td>Urea</td><td>Ehrlich's reagent + ZnSO₄</td><td>Yellow</td><td>435</td><td>—</td></tr>
+              <tr><td>CN⁻ (cyanide)</td><td>Br₂(aq), then p-phenylenediamine</td><td>Red</td><td>530</td><td>—</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="note-h3">Sensitivity and Detection Limits</h3>
+          <p class="note-p">The <strong>sensitivity</strong> of a UV/VIS method refers to the smallest change in concentration that produces a measurable change in absorbance. This is directly proportional to the molar absorptivity (ε). Methods with high ε (like Fe–phenanthroline with ε = 11,100) are very sensitive.</p>
+          <p class="note-p">The <strong>detection limit</strong> is the minimum concentration detectable above background noise. UV/VIS spectroscopy has detection limits in the range of <strong>10⁻⁴ to 10⁻⁶ mol dm⁻³</strong>, making it suitable for trace analysis in clinical and environmental samples.</p>
+          <div class="did-know">
+            <h4>Instrument Note</h4>
+            <p>Cuvettes and lenses used in UV spectroscopy must be made of <strong>quartz</strong> (silica), not ordinary glass, because glass absorbs UV radiation significantly. In visible spectroscopy, glass cuvettes are acceptable.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5.4 -->
+    <div class="collapsible" id="coll-54">
+      <div class="coll-header" onclick="toggleColl('coll-54')">
+        <div class="coll-title">
+          <span class="coll-badge">5.4</span>
+          <span class="coll-label">Beer-Lambert's Law and Calibration Curves</span>
+        </div>
+        <span class="coll-arrow">▼</span>
+      </div>
+      <div class="coll-body">
+        <div class="coll-inner">
+          <h3 class="note-h3">Statement of Beer-Lambert's Law</h3>
+          <p class="note-p">Beer-Lambert's Law combines two separate observations:</p>
+          <ul class="note-list">
+            <li><strong>Beer's Law:</strong> Absorbance is proportional to the concentration of the absorbing species.</li>
+            <li><strong>Lambert's Law:</strong> Absorbance is proportional to the path length through which light travels.</li>
+          </ul>
+          <div class="note-eq">A = ε l c</div>
+          <table class="note-table">
+            <thead><tr><th>Symbol</th><th>Quantity</th><th>Typical Unit</th></tr></thead>
+            <tbody>
+              <tr><td>A</td><td>Absorbance (dimensionless)</td><td>No units</td></tr>
+              <tr><td>ε (epsilon)</td><td>Molar absorptivity (molar extinction coefficient)</td><td>dm³ mol⁻¹ cm⁻¹ (or M⁻¹cm⁻¹)</td></tr>
+              <tr><td>l</td><td>Path length (width of cuvette)</td><td>cm</td></tr>
+              <tr><td>c</td><td>Concentration of absorbing species</td><td>mol dm⁻³</td></tr>
+            </tbody>
+          </table>
+
+          <h3 class="note-h3">Absorbance and Transmittance</h3>
+          <p class="note-p">Transmittance (T) is the fraction of incident light that passes through the solution. Absorbance and transmittance are related by:</p>
+          <div class="note-eq">A = log₁₀(I₀/I) = −log₁₀(T) = 2 − log₁₀(%T)</div>
+          <p class="note-p">If all light passes through: A = 0, %T = 100. If no light passes through: A → ∞, %T = 0.</p>
+
+          <h3 class="note-h3">Calibration Curves (Standard Curves)</h3>
+          <p class="note-p">A calibration curve is prepared by measuring the absorbance of several <strong>standard solutions</strong> of known concentration of the analyte. A graph of A (y-axis) vs c (x-axis) is plotted. By Beer-Lambert's Law, this should be a <strong>straight line through the origin</strong> with slope = εl.</p>
+          <p class="note-p">To find the concentration of an unknown solution: measure its absorbance and read the corresponding concentration from the calibration curve.</p>
+
+          <h3 class="note-h3">Deviation from Beer-Lambert's Law</h3>
+          <p class="note-p">Beer-Lambert's Law is obeyed when absorbance (A) ≤ 2. At higher concentrations, deviations occur because:</p>
+          <ul class="note-list">
+            <li>At high concentrations, solute–solute interactions alter the absorbing species</li>
+            <li>The refractive index of the solution changes significantly</li>
+            <li>Stray light reaching the detector at high absorbance</li>
+          </ul>
+          <p class="note-p">For this reason, working absorbances should ideally be in the range 0.1–0.8.</p>
+
+          <h3 class="note-h3">Worked Example</h3>
+          <div class="note-eq">
+A solution of KMnO₄ at 525 nm in a 1.0 cm cuvette has ε = 2200 M⁻¹cm⁻¹.<br>
+If c = 5.0 × 10⁻⁴ mol dm⁻³:<br>
+A = 2200 × 1.0 × 5.0 × 10⁻⁴ = <strong>1.10</strong><br>
+%T = 10^(2 − 1.10) × 1 = 10^0.9 ≈ <strong>7.9%</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5.5 -->
+    <div class="collapsible" id="coll-55">
+      <div class="coll-header" onclick="toggleColl('coll-55')">
+        <div class="coll-title">
+          <span class="coll-badge">5.5</span>
+          <span class="coll-label">Applications: Quantitation of Substances by UV/VIS Spectroscopy</span>
+        </div>
+        <span class="coll-arrow">▼</span>
+      </div>
+      <div class="coll-body">
+        <div class="coll-inner">
+          <h3 class="note-h3">Iron in Iron Tablets</h3>
+          <p class="note-p">Iron (Fe²⁺) ions in solution are very pale green and absorb light only weakly. A complexing reagent, <strong>1,10-phenanthroline</strong>, is added. Fe²⁺ reacts with three molecules of phenanthroline to form the deep orange-red complex [Fe(phen)₃]²⁺.</p>
+          <div class="note-eq">[Fe(phen)₃]²⁺: λmax = 510 nm, ε = 11,100 M⁻¹cm⁻¹</div>
+          <p class="note-p">The iron tablet is dissolved in dilute HCl, Fe³⁺ is reduced to Fe²⁺ with hydroxylamine, then phenanthroline and buffer are added. The absorbance is measured at 510 nm. A calibration curve using Fe²⁺ standards is used to calculate the iron content.</p>
+
+          <h3 class="note-h3">Glucose in Blood</h3>
+          <p class="note-p">Glucose is colourless and cannot be directly analysed by visible spectroscopy. Two methods are used:</p>
+          <ul class="note-list">
+            <li><strong>Enzymatic method:</strong> Glucose + glucose oxidase + peroxidase → coloured dye; measured at ~340 nm</li>
+            <li><strong>Benedict's method:</strong> Glucose reduces Cu²⁺ to Cu⁺ (copper(I) oxide precipitate); the decreasing blue colour of the solution is measured</li>
+          </ul>
+
+          <h3 class="note-h3">Urea in Blood</h3>
+          <p class="note-p">Urea is treated with zinc sulphate and Ehrlich's reagent (p-dimethylaminobenzaldehyde). The yellow product formed absorbs at <strong>435 nm</strong>. Urea can also be determined enzymatically using urease, with the product measured at 340 nm.</p>
+
+          <h3 class="note-h3">Cyanide in Water</h3>
+          <p class="note-p">Cyanide (CN⁻) is treated with bromine water to form cyanogen bromide (CNBr). Addition of p-phenylenediamine produces a <strong>red dye</strong> that absorbs strongly at <strong>530 nm</strong>. The method is sensitive and can detect very low concentrations of cyanide in treated water.</p>
+          <div class="did-know">
+            <h4>Industrial and Environmental Importance</h4>
+            <p>UV/VIS spectroscopy is used to monitor cyanide levels in water near gold mining operations (cyanide is used in gold extraction) and industrial effluent. Iron content is routinely tested in blood samples to diagnose anaemia and in food products to verify nutritional labelling.</p>
+          </div>
+          <table class="note-table">
+            <thead><tr><th>Substance</th><th>Matrix</th><th>Method / Reagent</th><th>λmax</th></tr></thead>
+            <tbody>
+              <tr><td>Iron (Fe²⁺)</td><td>Tablets, blood, food</td><td>1,10-phenanthroline</td><td>510 nm</td></tr>
+              <tr><td>Glucose</td><td>Blood, urine</td><td>Glucose oxidase / Benedict's</td><td>340 nm</td></tr>
+              <tr><td>Urea</td><td>Blood, serum</td><td>Ehrlich's reagent + ZnSO₄</td><td>435 nm</td></tr>
+              <tr><td>Cyanide (CN⁻)</td><td>Water, effluent</td><td>Br₂(aq) + p-phenylenediamine</td><td>530 nm</td></tr>
+              <tr><td>KMnO₄</td><td>Water treatment</td><td>Direct measurement</td><td>525 nm</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /notes-grid -->
+</div><!-- /tab-notes -->
+
+<!-- ══════════════════════════════════════════ SIMULATOR TAB ══════════════════════════════════════════ -->
+<div id="tab-simulator" class="tab-content">
+  <div class="sim-layout">
+    <!-- Left: Controls -->
+    <div class="panel" id="ctrlPanel">
+      <h3>Instrument Controls</h3>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Substance</div>
+        <select id="substanceSel" onchange="onSubstanceChange()">
+          <option value="kmno4">KMnO₄ — Potassium Permanganate</option>
+          <option value="cuso4">CuSO₄ — Copper(II) Sulfate</option>
+          <option value="fe_phen">Fe(phen)₃²⁺ — Iron-Phenanthroline</option>
+          <option value="methylene_blue">Methylene Blue</option>
+          <option value="cr3">Cr³⁺ — Chromium(III) Ion</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">
+          <span>Concentration</span>
+          <span class="ctrl-val" id="concVal">—</span>
+        </div>
+        <input type="range" id="concSlider" min="0" max="100" value="25" oninput="onConcChange()">
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;font-family:'IBM Plex Mono',monospace" id="concUnit"></div>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">Path Length (cuvette)</div>
+        <select id="pathSel" onchange="updateReadings()">
+          <option value="0.5">0.5 cm</option>
+          <option value="1" selected>1.0 cm</option>
+          <option value="2">2.0 cm</option>
+          <option value="5">5.0 cm</option>
+          <option value="10">10.0 cm</option>
+        </select>
+      </div>
+      <div class="ctrl-group">
+        <div class="ctrl-label">
+          <span>Wavelength (λ)</span>
+          <span class="ctrl-val" id="wlVal">525 nm</span>
+        </div>
+        <input type="range" id="wlSlider" min="200" max="800" value="525" oninput="onWlChange()">
+        <div id="wlColorBar" style="height:6px;border-radius:3px;margin-top:4px;background:linear-gradient(to right,#6a0dad,#0000ff,#00bfff,#00ff00,#ffff00,#ff7700,#ff0000)"></div>
+      </div>
+      <div class="ctrl-group" style="margin-top:18px">
+        <button class="power-btn" id="powerBtn" onclick="togglePower()">
+          <span class="power-dot"></span>
+          <span id="powerLabel">Light Source: OFF</span>
+        </button>
+      </div>
+      <div class="ctrl-group" style="margin-top:8px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Measure Mode</div>
+        <select id="probeMode">
+          <option value="abs">Absorbance (A)</option>
+          <option value="trans">Transmittance (%T)</option>
+          <option value="both">Both</option>
+        </select>
+      </div>
+      <div class="substance-info" id="substanceInfo" style="margin-top:12px"></div>
+    </div>
+
+    <!-- Center: Instrument + Spectrum -->
+    <div class="panel" style="padding:12px">
+      <div class="instrument-wrap">
+        <div class="instrument-label">
+          <span class="inst-dot"></span>
+          UV-VIS Spectrophotometer · Single Beam
+        </div>
+        <canvas id="instrCanvas" width="660" height="180"></canvas>
+      </div>
+      <div class="spectrum-wrap">
+        <div class="spectrum-label">Absorption Spectrum — <span id="spectrumSubName">KMnO₄</span></div>
+        <canvas id="specCanvas" width="660" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- Right: Readings -->
+    <div class="panel">
+      <h3>Probe Readings</h3>
+      <div class="reading-display">
+        <div class="reading-title">Absorbance (A)</div>
+        <div class="reading-value" id="absDisplay">—</div>
+        <div class="reading-unit">Dimensionless</div>
+      </div>
+      <div class="reading-display">
+        <div class="reading-title">Transmittance (%T)</div>
+        <div class="reading-value transmit" id="transDisplay">—</div>
+        <div class="reading-unit">Percent (%)</div>
+      </div>
+      <div class="reading-display" style="margin-bottom:14px">
+        <div class="reading-title">ε at λ selected</div>
+        <div class="reading-value" style="font-size:18px;color:var(--amber)" id="epsilonDisplay">—</div>
+        <div class="reading-unit">M⁻¹ cm⁻¹</div>
+      </div>
+      <button class="capture-btn" onclick="captureData()">⊕ Capture Data Point</button>
+      <button class="export-btn" onclick="exportCSV()">↓ Export Table (CSV)</button>
+      <button class="export-btn" style="margin-top:6px" onclick="clearAllData()">✕ Clear All Data</button>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="data-section">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600">Captured Data Points</h3>
+      <div class="tbl-actions">
+        <button class="sm-btn" onclick="sortData('conc')">Sort by [c]</button>
+        <button class="sm-btn" onclick="sortData('abs')">Sort by A</button>
+        <button class="sm-btn danger" onclick="clearAllData()">Clear All</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Substance</th>
+            <th>Concentration (mol dm⁻³)</th>
+            <th>Path Length (cm)</th>
+            <th>λ (nm)</th>
+            <th>ε (M⁻¹cm⁻¹)</th>
+            <th>Absorbance (A)</th>
+            <th>%T</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="dataTableBody">
+          <tr><td colspan="9" class="empty-msg">No data captured yet. Use the simulator above to measure absorbance values.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div><!-- /tab-simulator -->
+
+<!-- ══════════════════════════════════════════ CALIBRATION CURVE TAB ══════════════════════════════════════════ -->
+<div id="tab-calibration" class="tab-content">
+  <div class="cal-layout">
+    <!-- Config -->
+    <div class="panel cal-config">
+      <h3>Graph Configuration</h3>
+      <div class="cfg-group">
+        <label class="cfg-label">Graph Title</label>
+        <input type="text" class="cfg-input" id="cfgTitle" value="Calibration Curve" oninput="redrawCal()">
+      </div>
+      <div class="cfg-group">
+        <label class="cfg-label">X-Axis Label</label>
+        <input type="text" class="cfg-input" id="cfgXLabel" value="Concentration (mol dm⁻³)" oninput="redrawCal()">
+      </div>
+      <div class="cfg-group">
+        <label class="cfg-label">Y-Axis Label</label>
+        <input type="text" class="cfg-input" id="cfgYLabel" value="Absorbance (A)" oninput="redrawCal()">
+      </div>
+      <div class="cfg-group">
+        <label class="cfg-label">X-Axis Range</label>
+        <div class="cfg-row">
+          <input type="number" class="cfg-input" id="cfgXMin" value="0" step="any" oninput="redrawCal()" placeholder="Min">
+          <input type="number" class="cfg-input" id="cfgXMax" value="0.002" step="any" oninput="redrawCal()" placeholder="Max">
+        </div>
+      </div>
+      <div class="cfg-group">
+        <label class="cfg-label">Y-Axis Range</label>
+        <div class="cfg-row">
+          <input type="number" class="cfg-input" id="cfgYMin" value="0" step="any" oninput="redrawCal()" placeholder="Min">
+          <input type="number" class="cfg-input" id="cfgYMax" value="3" step="any" oninput="redrawCal()" placeholder="Max">
+        </div>
+      </div>
+      <div class="cfg-group">
+        <label class="cfg-label">Grid Step</label>
+        <div class="cfg-row">
+          <input type="number" class="cfg-input" id="cfgXStep" value="0.0005" step="any" oninput="redrawCal()" placeholder="X step">
+          <input type="number" class="cfg-input" id="cfgYStep" value="0.5" step="any" oninput="redrawCal()" placeholder="Y step">
+        </div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Grid</span>
+        <label class="toggle"><input type="checkbox" id="cfgGrid" checked onchange="redrawCal()"><span class="toggle-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Best-Fit Line</span>
+        <label class="toggle"><input type="checkbox" id="cfgBFL" checked onchange="redrawCal()"><span class="toggle-track"></span></label>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Origin (0,0)</span>
+        <label class="toggle"><input type="checkbox" id="cfgOrigin" checked onchange="redrawCal()"><span class="toggle-track"></span></label>
+      </div>
+      <div class="cfg-group" style="margin-top:12px">
+        <label class="cfg-label">Filter by Substance</label>
+        <select class="cfg-input" id="cfgFilter" onchange="redrawCal()" style="font-family:'DM Sans',sans-serif">
+          <option value="all">All Substances</option>
+          <option value="kmno4">KMnO₄</option>
+          <option value="cuso4">CuSO₄</option>
+          <option value="fe_phen">Fe(phen)₃²⁺</option>
+          <option value="methylene_blue">Methylene Blue</option>
+          <option value="cr3">Cr³⁺</option>
+        </select>
+      </div>
+      <button class="capture-btn" style="margin-top:12px" onclick="exportCalPNG()">↓ Export Graph (PNG)</button>
+      <button class="export-btn" style="margin-top:6px" onclick="autoScale()">⊞ Auto Scale</button>
+    </div>
+
+    <!-- Canvas -->
+    <div class="cal-canvas-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <h3 style="font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);font-weight:600;margin:0">Calibration Graph</h3>
+        <span style="font-size:11px;color:var(--text3)">GeoGebra-style grid paper</span>
+      </div>
+      <canvas id="calCanvas" width="900" height="560"></canvas>
+      <div class="stat-box" id="statBox">
+        <div class="stat-item"><div class="stat-val" id="statSlope">—</div><div class="stat-lbl">Slope (εl)</div></div>
+        <div class="stat-item"><div class="stat-val" id="statIntercept">—</div><div class="stat-lbl">Intercept</div></div>
+        <div class="stat-item"><div class="stat-val" id="statR2">—</div><div class="stat-lbl">R²</div></div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px;font-style:italic" id="bestFitEq"></div>
+    </div>
+  </div>
+</div><!-- /tab-calibration -->
+
+<script>
+// ══════════════════════════════════════════════════════════
+// SUBSTANCE DATA
+// ══════════════════════════════════════════════════════════
+const SUBSTANCES = {
+  kmno4:{
+    name:'Potassium Permanganate (KMnO₄)',shortName:'KMnO₄',
+    lambdaMax:525, epsilon:2200,
+    peaks:[{c:510,a:1800,s:10},{c:525,a:2200,s:10},{c:545,a:1500,s:11}],
+    solutionRGB:[130,0,130], concMin:0, concMax:0.002, concDefault:0.0005,
+    concStep:0.0001, concUnit:'mol dm⁻³',
+    color:'#8B00BC',
+    info:'Deep purple; λmax = 525 nm; ε = 2,200 M⁻¹cm⁻¹. Multiple absorption peaks (510, 525, 545 nm). Used in water treatment analysis.',
+    spectrum:'vis'
+  },
+  cuso4:{
+    name:'Copper(II) Sulfate (CuSO₄)',shortName:'CuSO₄',
+    lambdaMax:810, epsilon:12,
+    peaks:[{c:810,a:12,s:90},{c:650,a:6,s:70}],
+    solutionRGB:[70,130,180], concMin:0, concMax:1.0, concDefault:0.2,
+    concStep:0.02, concUnit:'mol dm⁻³',
+    color:'#1565C0',
+    info:'Pale blue; λmax ≈ 810 nm (near-IR); ε = 12 M⁻¹cm⁻¹. Very low absorptivity; requires high concentrations. Visible lab measurements at ~645 nm.',
+    spectrum:'vis'
+  },
+  fe_phen:{
+    name:'Iron(II)–Phenanthroline Complex',shortName:'Fe(phen)₃²⁺',
+    lambdaMax:510, epsilon:11100,
+    peaks:[{c:510,a:11100,s:40}],
+    solutionRGB:[204,60,0], concMin:0, concMax:0.00005, concDefault:0.000008,
+    concStep:0.000001, concUnit:'mol dm⁻³',
+    color:'#CC4400',
+    info:'Orange-red complex; λmax = 510 nm; ε = 11,100 M⁻¹cm⁻¹. CAPE 5.5: used to quantify iron in tablets & blood. Very high sensitivity.',
+    spectrum:'vis'
+  },
+  methylene_blue:{
+    name:'Methylene Blue',shortName:'MB',
+    lambdaMax:665, epsilon:74000,
+    peaks:[{c:665,a:74000,s:25},{c:610,a:18000,s:20},{c:292,a:45000,s:15}],
+    solutionRGB:[0,60,180], concMin:0, concMax:0.00001, concDefault:0.000002,
+    concStep:0.0000005, concUnit:'mol dm⁻³',
+    color:'#0044CC',
+    info:'Deep blue dye; λmax = 665 nm; ε = 74,000 M⁻¹cm⁻¹. Extremely high molar absorptivity. Widely used in textile and environmental analysis.',
+    spectrum:'vis'
+  },
+  cr3:{
+    name:'Chromium(III) Sulfate [Cr³⁺(aq)]',shortName:'Cr³⁺',
+    lambdaMax:575, epsilon:15,
+    peaks:[{c:408,a:16,s:30},{c:575,a:15,s:40}],
+    solutionRGB:[60,120,50], concMin:0, concMax:0.5, concDefault:0.1,
+    concStep:0.01, concUnit:'mol dm⁻³',
+    color:'#2E7D32',
+    info:'Green solution; d-d transitions at 408 nm & 575 nm; ε ≈ 15 M⁻¹cm⁻¹. Low absorptivity due to spin-forbidden d-d transitions.',
+    spectrum:'vis'
+  }
+};
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let lightOn = false;
+let capturedData = [];
+let currentSubstance = SUBSTANCES.kmno4;
+let animFrame = null;
+let animPhase = 0;
+
+// ══════════════════════════════════════════════════════════
+// SPECTRUM CALCULATIONS
+// ══════════════════════════════════════════════════════════
+function gauss(lambda, center, amp, sigma){
+  return amp * Math.exp(-0.5 * Math.pow((lambda-center)/sigma, 2));
+}
+function getEpsilonAt(lambda, subst){
+  return subst.peaks.reduce((s,p)=>s+gauss(lambda,p.c,p.a,p.s), 0);
+}
+function calcAbs(epsilon, conc, path){
+  return epsilon * conc * path;
+}
+function calcTrans(A){
+  return Math.min(Math.pow(10, -A)*100, 100);
+}
+
+// ══════════════════════════════════════════════════════════
+// WAVELENGTH TO COLOR
+// ══════════════════════════════════════════════════════════
+function wavelengthToRGBA(nm, alpha=1){
+  let r=0,g=0,b=0;
+  if(nm>=380&&nm<440){r=-(nm-440)/60;g=0;b=1;}
+  else if(nm>=440&&nm<490){r=0;g=(nm-440)/50;b=1;}
+  else if(nm>=490&&nm<510){r=0;g=1;b=-(nm-510)/20;}
+  else if(nm>=510&&nm<580){r=(nm-510)/70;g=1;b=0;}
+  else if(nm>=580&&nm<645){r=1;g=-(nm-645)/65;b=0;}
+  else if(nm>=645&&nm<=780){r=1;g=0;b=0;}
+  let f=nm<420?0.3+0.7*(nm-380)/40:nm>700?0.3+0.7*(780-nm)/80:1;
+  return `rgba(${Math.round(r*255*f)},${Math.round(g*255*f)},${Math.round(b*255*f)},${alpha})`;
+}
+function getBeamColor(nm){
+  if(nm<380||nm>780) return nm<380?'rgba(150,0,200,0.9)':'rgba(180,0,0,0.5)';
+  return wavelengthToRGBA(nm, 0.95);
+}
+
+// ══════════════════════════════════════════════════════════
+// UI CONTROLS
+// ══════════════════════════════════════════════════════════
+function getConc(){
+  const s = currentSubstance;
+  const v = parseFloat(document.getElementById('concSlider').value)/100;
+  return s.concMin + v*(s.concMax - s.concMin);
+}
+function getPathLen(){ return parseFloat(document.getElementById('pathSel').value); }
+function getWavelength(){ return parseFloat(document.getElementById('wlSlider').value); }
+
+function onSubstanceChange(){
+  const id = document.getElementById('substanceSel').value;
+  currentSubstance = SUBSTANCES[id];
+  document.getElementById('substanceInfo').textContent = currentSubstance.info;
+  document.getElementById('spectrumSubName').textContent = currentSubstance.shortName;
+  // Set slider to default concentration
+  const s = currentSubstance;
+  const pct = ((s.concDefault - s.concMin)/(s.concMax - s.concMin))*100;
+  document.getElementById('concSlider').value = pct;
+  // Set wavelength to lambdaMax
+  document.getElementById('wlSlider').value = s.lambdaMax;
+  document.getElementById('wlVal').textContent = s.lambdaMax + ' nm';
+  updateConcDisplay();
+  updateReadings();
+  drawSpectrum();
+  if(lightOn) drawInstrument();
+}
+function onConcChange(){
+  updateConcDisplay();
+  updateReadings();
+  if(lightOn) drawInstrument();
+}
+function onWlChange(){
+  const wl = getWavelength();
+  document.getElementById('wlVal').textContent = wl + ' nm';
+  updateReadings();
+  drawSpectrum();
+  if(lightOn) drawInstrument();
+}
+function updateConcDisplay(){
+  const c = getConc();
+  const s = currentSubstance;
+  let display;
+  if(c===0){display='0';}
+  else if(c<0.001){display=(c*1e6).toFixed(2)+' µmol dm⁻³';}
+  else if(c<0.01){display=(c*1000).toFixed(2)+' mmol dm⁻³';}
+  else{display=c.toFixed(4)+' mol dm⁻³';}
+  document.getElementById('concVal').textContent = display;
+  document.getElementById('concUnit').textContent = c.toExponential(3)+' mol dm⁻³';
+}
+function updateReadings(){
+  const c = getConc();
+  const l = getPathLen();
+  const wl = getWavelength();
+  const eps = getEpsilonAt(wl, currentSubstance);
+  const A = lightOn ? calcAbs(eps, c, l) : NaN;
+  const T = lightOn ? calcTrans(A) : NaN;
+  document.getElementById('absDisplay').textContent = lightOn ? (A>0.001?A.toFixed(4):'0.0000') : '—';
+  document.getElementById('transDisplay').textContent = lightOn ? T.toFixed(2) : '—';
+  document.getElementById('epsilonDisplay').textContent = eps.toFixed(0);
+}
+
+function togglePower(){
+  lightOn = !lightOn;
+  const btn = document.getElementById('powerBtn');
+  btn.classList.toggle('on', lightOn);
+  document.getElementById('powerLabel').textContent = 'Light Source: '+(lightOn?'ON':'OFF');
+  updateReadings();
+  drawInstrument();
+}
+
+// ══════════════════════════════════════════════════════════
+// INSTRUMENT CANVAS DRAWING
+// ══════════════════════════════════════════════════════════
+function drawInstrument(){
+  const canvas = document.getElementById('instrCanvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  const wl = getWavelength();
+  const c = getConc();
+  const l = getPathLen();
+  const eps = getEpsilonAt(wl, currentSubstance);
+  const A = calcAbs(eps, c, l);
+  const T = calcTrans(A)/100;
+  const beamColor = getBeamColor(wl);
+  const sub = currentSubstance;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Background
+  const bg = ctx.createLinearGradient(0,0,0,H);
+  bg.addColorStop(0,'#1a2035'); bg.addColorStop(1,'#0e1525');
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+  // ─ Layout coords ─
+  const srcX=55, slitX=130, gratingX=200, cuvetteX=290, cuvetteW=Math.min(l*30,80), detX=580;
+  const beamY=H/2;
+
+  // ── LIGHT SOURCE ──
+  ctx.save();
+  if(lightOn){
+    // Glow
+    const grd=ctx.createRadialGradient(srcX,beamY,0,srcX,beamY,35);
+    grd.addColorStop(0,beamColor.replace('rgba','rgba').replace(/,[^,]+\)$/,',0.35)'));
+    grd.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(srcX,beamY,35,0,Math.PI*2); ctx.fill();
+  }
+  // Body
+  ctx.beginPath(); ctx.arc(srcX,beamY,18,0,Math.PI*2);
+  ctx.fillStyle = lightOn?'#ffee88':'#2a3348';
+  ctx.strokeStyle='#4a5680'; ctx.lineWidth=1.5; ctx.fill(); ctx.stroke();
+  ctx.fillStyle = lightOn?'#fff8e1':'#3a4560';
+  ctx.beginPath(); ctx.arc(srcX,beamY,12,0,Math.PI*2); ctx.fill();
+  // Label
+  ctx.fillStyle='#4a5680'; ctx.font='9px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('SOURCE', srcX, beamY+28);
+  ctx.restore();
+
+  // ── SLIT ──
+  ctx.save();
+  ctx.fillStyle='#2a3348'; ctx.strokeStyle='#3a4d70'; ctx.lineWidth=1;
+  ctx.fillRect(slitX-6, beamY-22, 12, 44); ctx.strokeRect(slitX-6, beamY-22, 12, 44);
+  ctx.fillStyle='#0a0e1a'; ctx.fillRect(slitX-1, beamY-14, 2, 28);
+  ctx.fillStyle='#4a5680'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('SLIT', slitX, beamY+32);
+  ctx.restore();
+
+  // ── GRATING (monochromator) ──
+  ctx.save();
+  ctx.fillStyle='#1e2e48'; ctx.strokeStyle='#3a4d70'; ctx.lineWidth=1;
+  ctx.beginPath();
+  ctx.roundRect(gratingX-14,beamY-24,28,48,4);
+  ctx.fill(); ctx.stroke();
+  for(let i=0;i<6;i++){
+    const ly=beamY-16+i*6;
+    ctx.strokeStyle='rgba(0,229,255,0.3)'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(gratingX-10,ly); ctx.lineTo(gratingX+10,ly); ctx.stroke();
+  }
+  // Wavelength indicator
+  if(lightOn){
+    ctx.fillStyle=beamColor; ctx.beginPath(); ctx.arc(gratingX,beamY-30,5,0,Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle='#4a5680'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText(wl+'nm', gratingX, beamY+35);
+  ctx.restore();
+
+  // ── BEAM (source → cuvette) ──
+  if(lightOn){
+    ctx.save();
+    const bw=5;
+    // Draw animated beam from grating to cuvette entry
+    const beamGrad = ctx.createLinearGradient(gratingX+14, 0, cuvetteX, 0);
+    beamGrad.addColorStop(0, beamColor);
+    beamGrad.addColorStop(1, beamColor);
+    ctx.fillStyle = beamGrad;
+    ctx.globalAlpha = 0.8;
+
+    // Animate dashes
+    const dashLen=12, gapLen=8, period=dashLen+gapLen;
+    const phase = (Date.now()/40) % period;
+    ctx.setLineDash([dashLen, gapLen]); ctx.lineDashOffset=-phase;
+    ctx.strokeStyle=beamColor; ctx.lineWidth=bw;
+    ctx.globalAlpha=0.9;
+    ctx.beginPath(); ctx.moveTo(gratingX+14, beamY); ctx.lineTo(cuvetteX-2, beamY); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha=1;
+    ctx.restore();
+  }
+
+  // ── CUVETTE ──
+  ctx.save();
+  const cvH=60, cvY=beamY-cvH/2;
+  // Outer walls (quartz)
+  ctx.strokeStyle='#88aacc'; ctx.lineWidth=2;
+  ctx.strokeRect(cuvetteX, cvY, cuvetteW, cvH);
+  // Solution fill
+  if(c>0){
+    const rgb=sub.solutionRGB;
+    const alpha=Math.min(0.15+c/sub.concMax*0.75, 0.92);
+    ctx.fillStyle=`rgba(${rgb[0]},${rgb[1]},${rgb[2]},${alpha})`;
+    ctx.fillRect(cuvetteX+2, cvY+2, cuvetteW-4, cvH-4);
+  } else {
+    ctx.fillStyle='rgba(255,255,255,0.05)';
+    ctx.fillRect(cuvetteX+2, cvY+2, cuvetteW-4, cvH-4);
+  }
+  // Thin lines showing solution
+  ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=0.5;
+  for(let i=1;i<5;i++){
+    ctx.beginPath(); ctx.moveTo(cuvetteX+i*(cuvetteW/5),cvY+2); ctx.lineTo(cuvetteX+i*(cuvetteW/5),cvY+cvH-2); ctx.stroke();
+  }
+  // Path length marker
+  ctx.strokeStyle='rgba(255,200,0,0.5)'; ctx.lineWidth=0.5; ctx.setLineDash([2,2]);
+  ctx.beginPath(); ctx.moveTo(cuvetteX,cvY-8); ctx.lineTo(cuvetteX+cuvetteW,cvY-8); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,200,0,0.7)'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText(l+'cm', cuvetteX+cuvetteW/2, cvY-12);
+  // Labels
+  ctx.fillStyle='#5a6888'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('CUVETTE', cuvetteX+cuvetteW/2, cvY+cvH+14);
+  ctx.restore();
+
+  // ── TRANSMITTED BEAM (cuvette → detector) ──
+  if(lightOn){
+    ctx.save();
+    const exitX = cuvetteX+cuvetteW+2;
+    const phase = (Date.now()/40) % 20;
+    ctx.setLineDash([12, 8]); ctx.lineDashOffset=-phase;
+    ctx.strokeStyle=beamColor; ctx.lineWidth=5*Math.max(T,0.05); ctx.globalAlpha=Math.max(T,0.05)*0.9;
+    ctx.beginPath(); ctx.moveTo(exitX, beamY); ctx.lineTo(detX-12, beamY); ctx.stroke();
+    ctx.setLineDash([]); ctx.globalAlpha=1;
+    ctx.restore();
+    // Transmittance label above beam
+    ctx.save();
+    const midX = exitX+(detX-exitX)/2;
+    ctx.fillStyle='rgba(118,255,3,0.7)'; ctx.font='9px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText('%T = '+calcTrans(A).toFixed(1), midX, beamY-12);
+    ctx.restore();
+  }
+
+  // ── DETECTOR ──
+  ctx.save();
+  const dGrd = ctx.createLinearGradient(detX,0,detX+40,0);
+  dGrd.addColorStop(0,'#1e2e48'); dGrd.addColorStop(1,'#2a3d58');
+  ctx.fillStyle=dGrd; ctx.strokeStyle='#3a4d70'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.roundRect(detX-5,beamY-22,48,44,4); ctx.fill(); ctx.stroke();
+  if(lightOn){
+    const ledAlpha=Math.max(T,0.05);
+    ctx.fillStyle=`rgba(0,229,255,${ledAlpha*0.8})`;
+    ctx.beginPath(); ctx.arc(detX+18,beamY,8,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle=`rgba(0,229,255,${ledAlpha})`; ctx.lineWidth=1; ctx.stroke();
+  }
+  ctx.fillStyle='#4a5680'; ctx.font='9px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('DETECTOR', detX+18, beamY+32);
+  ctx.restore();
+
+  // ── Labels ──
+  ctx.fillStyle='rgba(74,86,128,0.5)'; ctx.font='9px IBM Plex Mono'; ctx.textAlign='left';
+  ctx.fillText(lightOn?'POWER: ON':'POWER: OFF', 10, 14);
+  ctx.textAlign='right';
+  ctx.fillText(sub.shortName+' | λ='+wl+'nm | c='+getConc().toExponential(2), W-10, 14);
+
+  // Schedule next frame if light is on
+  if(lightOn){
+    cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(drawInstrument);
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// SPECTRUM CANVAS DRAWING
+// ══════════════════════════════════════════════════════════
+function drawSpectrum(){
+  const canvas = document.getElementById('specCanvas');
+  const ctx = canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const pad={l:50,r:20,t:18,b:28};
+  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+  const lambdaMin=200, lambdaMax=800;
+  const wlCurr = getWavelength();
+  const sub = currentSubstance;
+
+  ctx.clearRect(0,0,W,H);
+
+  // Dark background
+  ctx.fillStyle='#0e1525'; ctx.fillRect(0,0,W,H);
+
+  // Compute spectrum max for normalization
+  let specMax=0;
+  for(let lm=lambdaMin;lm<=lambdaMax;lm+=2){
+    specMax = Math.max(specMax, getEpsilonAt(lm, sub));
+  }
+  if(specMax===0) specMax=1;
+
+  // Draw visible spectrum color bar
+  const barH=10, barY=pad.t+ph-barH;
+  for(let px=0;px<pw;px++){
+    const lm=lambdaMin+(px/pw)*(lambdaMax-lambdaMin);
+    if(lm>=380&&lm<=700){
+      ctx.fillStyle=wavelengthToRGBA(lm,0.7);
+    } else {
+      ctx.fillStyle='rgba(50,40,60,0.3)';
+    }
+    ctx.fillRect(pad.l+px, barY, 1, barH);
+  }
+
+  // Gridlines
+  ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=0.5;
+  for(let g=0;g<=5;g++){
+    const gy=pad.t+g*(ph-barH-4)/5;
+    ctx.beginPath(); ctx.moveTo(pad.l,gy); ctx.lineTo(pad.l+pw,gy); ctx.stroke();
+  }
+  const xSteps=[200,300,400,500,600,700,800];
+  xSteps.forEach(lm=>{
+    const x=pad.l+(lm-lambdaMin)/(lambdaMax-lambdaMin)*pw;
+    ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph-barH-2); ctx.stroke();
+    ctx.fillStyle='#3a4560'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+    ctx.fillText(lm, x, pad.t+ph+8);
+  });
+
+  // Y-axis label
+  ctx.save();
+  ctx.translate(12, pad.t+ph/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillStyle='#3a4560'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('Molar Absorptivity (ε)', 0, 0);
+  ctx.restore();
+
+  // Draw spectrum curve
+  ctx.save();
+  ctx.beginPath();
+  let first=true;
+  for(let px=0;px<=pw;px++){
+    const lm=lambdaMin+(px/pw)*(lambdaMax-lambdaMin);
+    const eps=getEpsilonAt(lm,sub);
+    const y=pad.t+(ph-barH-6)*(1-eps/specMax);
+    if(first){ctx.moveTo(pad.l+px,y);first=false;}
+    else{ctx.lineTo(pad.l+px,y);}
+  }
+  ctx.strokeStyle=sub.color; ctx.lineWidth=1.8; ctx.stroke();
+  // Fill under curve
+  const lm0=lambdaMin, lmN=lambdaMax;
+  ctx.lineTo(pad.l+pw, pad.t+(ph-barH-6));
+  ctx.lineTo(pad.l, pad.t+(ph-barH-6));
+  ctx.closePath();
+  ctx.fillStyle=sub.color.replace('#','');
+  // parse hex
+  const hx=sub.color.replace('#','');
+  const r=parseInt(hx.substring(0,2),16), g2=parseInt(hx.substring(2,4),16), b2=parseInt(hx.substring(4,6),16);
+  ctx.fillStyle=`rgba(${r},${g2},${b2},0.12)`;
+  ctx.fill();
+  ctx.restore();
+
+  // λmax marker
+  const lmMaxX=pad.l+(sub.lambdaMax-lambdaMin)/(lambdaMax-lambdaMin)*pw;
+  ctx.save();
+  ctx.strokeStyle='rgba(255,200,0,0.6)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(lmMaxX,pad.t); ctx.lineTo(lmMaxX,pad.t+ph-barH-2); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='rgba(255,200,0,0.8)'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText('λmax='+sub.lambdaMax, lmMaxX, pad.t+8);
+  ctx.restore();
+
+  // Current wavelength marker
+  const wlX=pad.l+(wlCurr-lambdaMin)/(lambdaMax-lambdaMin)*pw;
+  ctx.save();
+  ctx.strokeStyle='rgba(255,80,80,0.9)'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(wlX,pad.t); ctx.lineTo(wlX,pad.t+ph-barH-2); ctx.stroke();
+  // Circle at intersection
+  const epsCurr=getEpsilonAt(wlCurr,sub);
+  const intY=pad.t+(ph-barH-6)*(1-epsCurr/specMax);
+  ctx.fillStyle='#ff5050'; ctx.beginPath(); ctx.arc(wlX,intY,4,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='rgba(255,80,80,0.85)'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='center';
+  ctx.fillText(wlCurr+'nm', wlX, pad.t+ph+8);
+  ctx.restore();
+
+  // ε value annotation
+  ctx.save();
+  const epsDisp=epsCurr.toFixed(0);
+  ctx.fillStyle='rgba(255,80,80,0.8)'; ctx.font='8px IBM Plex Mono'; ctx.textAlign='left';
+  ctx.fillText('ε='+epsDisp, wlX+5, intY-4);
+  ctx.restore();
+
+  // Axes
+  ctx.strokeStyle='rgba(255,255,255,0.2)'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph-barH-2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t+ph-barH-2); ctx.lineTo(pad.l+pw,pad.t+ph-barH-2); ctx.stroke();
+  ctx.fillStyle='#4a5680'; ctx.font='7px IBM Plex Mono'; ctx.textAlign='right';
+  ctx.fillText(specMax.toFixed(0), pad.l-3, pad.t+6);
+  ctx.fillText('0', pad.l-3, pad.t+ph-barH-2);
+}
+
+// ══════════════════════════════════════════════════════════
+// DATA CAPTURE
+// ══════════════════════════════════════════════════════════
+function captureData(){
+  if(!lightOn){alert('Turn on the light source first.');return;}
+  const c=getConc(), l=getPathLen(), wl=getWavelength();
+  const eps=getEpsilonAt(wl,currentSubstance);
+  const A=calcAbs(eps,c,l);
+  const T=calcTrans(A);
+  const sub=document.getElementById('substanceSel').value;
+  capturedData.push({
+    id:Date.now(),sub,
+    name:currentSubstance.shortName,
+    c,l,wl,eps:parseFloat(eps.toFixed(2)),
+    A:parseFloat(A.toFixed(4)),
+    T:parseFloat(T.toFixed(2))
+  });
+  renderTable();
+  redrawCal();
+}
+
+function renderTable(){
+  const tbody=document.getElementById('dataTableBody');
+  if(capturedData.length===0){
+    tbody.innerHTML='<tr><td colspan="9" class="empty-msg">No data captured yet. Use the simulator above to measure absorbance values.</td></tr>';
+    return;
+  }
+  tbody.innerHTML=capturedData.map((d,i)=>`
+    <tr>
+      <td class="mono">${i+1}</td>
+      <td>${d.name}</td>
+      <td class="mono">${d.c.toExponential(4)}</td>
+      <td class="mono">${d.l}</td>
+      <td class="mono">${d.wl}</td>
+      <td class="mono">${d.eps.toFixed(1)}</td>
+      <td class="mono" style="color:var(--accent)">${d.A.toFixed(4)}</td>
+      <td class="mono" style="color:var(--green)">${d.T.toFixed(2)}</td>
+      <td><button class="del-btn" onclick="deleteRow(${d.id})">✕</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteRow(id){
+  capturedData=capturedData.filter(d=>d.id!==id);
+  renderTable(); redrawCal();
+}
+function clearAllData(){
+  if(capturedData.length>0&&!confirm('Clear all captured data?')) return;
+  capturedData=[];
+  renderTable(); redrawCal();
+}
+function sortData(key){
+  if(key==='conc') capturedData.sort((a,b)=>a.c-b.c);
+  else if(key==='abs') capturedData.sort((a,b)=>a.A-b.A);
+  renderTable();
+}
+function exportCSV(){
+  if(capturedData.length===0){alert('No data to export.');return;}
+  const hdr='#,Substance,Concentration (mol/dm3),Path Length (cm),Wavelength (nm),Epsilon (M-1cm-1),Absorbance (A),Transmittance (%T)';
+  const rows=capturedData.map((d,i)=>`${i+1},${d.name},${d.c},${d.l},${d.wl},${d.eps},${d.A},${d.T}`);
+  const csv=[hdr,...rows].join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='uvvis_data.csv'; a.click();
+}
+
+// ══════════════════════════════════════════════════════════
+// CALIBRATION CURVE (GeoGebra-style)
+// ══════════════════════════════════════════════════════════
+function getCalData(){
+  const filter=document.getElementById('cfgFilter').value;
+  return filter==='all'?capturedData:capturedData.filter(d=>d.sub===filter);
+}
+function linearRegression(pts){
+  const n=pts.length; if(n<2) return null;
+  const useOrigin=document.getElementById('cfgOrigin').checked;
+  if(useOrigin){
+    const sumXY=pts.reduce((s,p)=>s+p.x*p.y,0);
+    const sumX2=pts.reduce((s,p)=>s+p.x*p.x,0);
+    const slope=sumXY/sumX2;
+    const yPred=pts.map(p=>slope*p.x);
+    const ssRes=pts.reduce((s,p,i)=>s+Math.pow(p.y-yPred[i],2),0);
+    const yMean=pts.reduce((s,p)=>s+p.y,0)/n;
+    const ssTot=pts.reduce((s,p)=>s+Math.pow(p.y-yMean,2),0);
+    return{slope,intercept:0,r2:Math.max(0,1-ssRes/ssTot)};
+  }
+  const sumX=pts.reduce((s,p)=>s+p.x,0);
+  const sumY=pts.reduce((s,p)=>s+p.y,0);
+  const sumXY=pts.reduce((s,p)=>s+p.x*p.y,0);
+  const sumX2=pts.reduce((s,p)=>s+p.x*p.x,0);
+  const slope=(n*sumXY-sumX*sumY)/(n*sumX2-sumX*sumX);
+  const intercept=(sumY-slope*sumX)/n;
+  const yMean=sumY/n;
+  const ssTot=pts.reduce((s,p)=>s+Math.pow(p.y-yMean,2),0);
+  const ssRes=pts.reduce((s,p)=>s+Math.pow(p.y-(slope*p.x+intercept),2),0);
+  return{slope,intercept,r2:Math.max(0,1-ssRes/ssTot)};
+}
+
+const SUB_COLORS={kmno4:'#9B2FBE',cuso4:'#1565C0',fe_phen:'#CC4400',methylene_blue:'#0044CC',cr3:'#2E7D32'};
+
+function redrawCal(){
+  const canvas=document.getElementById('calCanvas');
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width, H=canvas.height;
+  const xMin=parseFloat(document.getElementById('cfgXMin').value)||0;
+  const xMax=parseFloat(document.getElementById('cfgXMax').value)||0.002;
+  const yMin=parseFloat(document.getElementById('cfgYMin').value)||0;
+  const yMax=parseFloat(document.getElementById('cfgYMax').value)||3;
+  const xStep=parseFloat(document.getElementById('cfgXStep').value)||0.0005;
+  const yStep=parseFloat(document.getElementById('cfgYStep').value)||0.5;
+  const title=document.getElementById('cfgTitle').value||'Calibration Curve';
+  const xLabel=document.getElementById('cfgXLabel').value;
+  const yLabel=document.getElementById('cfgYLabel').value;
+  const showGrid=document.getElementById('cfgGrid').checked;
+  const showBFL=document.getElementById('cfgBFL').checked;
+
+  const pad={l:72,r:30,t:52,b:60};
+  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+
+  function toCanvasX(v){return pad.l+(v-xMin)/(xMax-xMin)*pw;}
+  function toCanvasY(v){return pad.t+ph-(v-yMin)/(yMax-yMin)*ph;}
+
+  // ── White paper background ──
+  ctx.fillStyle='#ffffff'; ctx.fillRect(0,0,W,H);
+
+  // ── Minor grid lines (GeoGebra style) ──
+  if(showGrid){
+    // Very light blue minor grid
+    ctx.strokeStyle='#ddeef8'; ctx.lineWidth=0.6;
+    // X minor grid at every step
+    for(let v=xMin;v<=xMax+xStep*0.01;v+=xStep){
+      const x=toCanvasX(v);
+      if(x<pad.l-1||x>pad.l+pw+1) continue;
+      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
+    }
+    // Y minor grid
+    for(let v=yMin;v<=yMax+yStep*0.01;v+=yStep){
+      const y=toCanvasY(v);
+      if(y<pad.t-1||y>pad.t+ph+1) continue;
+      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
+    }
+    // Every 5th major (darker)
+    ctx.strokeStyle='#b8d9f0'; ctx.lineWidth=0.8;
+    let xCnt=0;
+    for(let v=xMin;v<=xMax+xStep*0.01;v+=xStep){
+      if(xCnt%5===0){
+        const x=toCanvasX(v);
+        if(x<pad.l-1||x>pad.l+pw+1){xCnt++;continue;}
+        ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
+      }
+      xCnt++;
+    }
+    let yCnt=0;
+    for(let v=yMin;v<=yMax+yStep*0.01;v+=yStep){
+      if(yCnt%5===0){
+        const y=toCanvasY(v);
+        if(y<pad.t-1||y>pad.t+ph+1){yCnt++;continue;}
+        ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
+      }
+      yCnt++;
+    }
+  }
+
+  // ── Plot border ──
+  ctx.strokeStyle='#c0ccd8'; ctx.lineWidth=0.7;
+  ctx.strokeRect(pad.l,pad.t,pw,ph);
+
+  // ── Axes ──
+  ctx.strokeStyle='#1a2030'; ctx.lineWidth=1.8;
+  // Y axis
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph+5); ctx.stroke();
+  // X axis
+  ctx.beginPath(); ctx.moveTo(pad.l-5,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+
+  // ── X axis ticks + labels ──
+  ctx.fillStyle='#334'; ctx.font='11px DM Sans'; ctx.textAlign='center';
+  for(let v=xMin;v<=xMax+xStep*0.01;v+=xStep){
+    const x=toCanvasX(v);
+    if(x<pad.l-1||x>pad.l+pw+1) continue;
+    ctx.strokeStyle='#1a2030'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(x,pad.t+ph); ctx.lineTo(x,pad.t+ph+5); ctx.stroke();
+    // Format label
+    let lbl;
+    if(Math.abs(v)<1e-4&&v!==0) lbl=v.toExponential(1);
+    else if(Math.abs(v)<0.01) lbl=(v*1000).toFixed(1)+'m';
+    else lbl=v.toFixed(4).replace(/\.?0+$/,'');
+    ctx.fillStyle='#334'; ctx.font='10px DM Sans';
+    ctx.fillText(lbl, x, pad.t+ph+18);
+  }
+
+  // ── Y axis ticks + labels ──
+  ctx.textAlign='right';
+  for(let v=yMin;v<=yMax+yStep*0.01;v+=yStep){
+    const y=toCanvasY(v);
+    if(y<pad.t-1||y>pad.t+ph+1) continue;
+    ctx.strokeStyle='#1a2030'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l-5,y); ctx.stroke();
+    ctx.fillStyle='#334'; ctx.font='10px DM Sans';
+    ctx.fillText(v.toFixed(2).replace(/\.?0+$/,''), pad.l-8, y+4);
+  }
+
+  // ── Axis labels ──
+  ctx.fillStyle='#223'; ctx.font='bold 12px DM Sans'; ctx.textAlign='center';
+  ctx.fillText(xLabel, pad.l+pw/2, H-12);
+  ctx.save();
+  ctx.translate(16, pad.t+ph/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(yLabel, 0, 0);
+  ctx.restore();
+
+  // ── Title ──
+  ctx.fillStyle='#112'; ctx.font='bold 14px Libre Baskerville,serif'; ctx.textAlign='center';
+  ctx.fillText(title, pad.l+pw/2, 28);
+
+  // ── Data points ──
+  const data=getCalData();
+  const pts=data.map(d=>({x:d.c,y:d.A,sub:d.sub,name:d.name}));
+
+  // Best-fit line
+  if(showBFL&&pts.length>=2){
+    const reg=linearRegression(pts);
+    if(reg){
+      const x1=xMin, y1=reg.slope*x1+reg.intercept;
+      const x2=xMax, y2=reg.slope*x2+reg.intercept;
+      ctx.save();
+      ctx.setLineDash([5,4]); ctx.strokeStyle='rgba(50,100,200,0.7)'; ctx.lineWidth=1.5;
+      ctx.beginPath(); ctx.moveTo(toCanvasX(x1),toCanvasY(y1)); ctx.lineTo(toCanvasX(x2),toCanvasY(y2)); ctx.stroke();
+      ctx.setLineDash([]);
+      // Confidence band (simple visual band)
+      ctx.globalAlpha=0.05; ctx.fillStyle='#3366cc';
+      ctx.beginPath(); ctx.moveTo(toCanvasX(x1),toCanvasY(y1)-5);
+      ctx.lineTo(toCanvasX(x2),toCanvasY(y2)-5);
+      ctx.lineTo(toCanvasX(x2),toCanvasY(y2)+5);
+      ctx.lineTo(toCanvasX(x1),toCanvasY(y1)+5); ctx.closePath(); ctx.fill();
+      ctx.globalAlpha=1; ctx.restore();
+      // Update stats
+      document.getElementById('statSlope').textContent = reg.slope.toExponential(3);
+      document.getElementById('statIntercept').textContent = reg.intercept.toFixed(4);
+      document.getElementById('statR2').textContent = reg.r2.toFixed(5);
+      const sign=reg.intercept>=0?'+':'-';
+      document.getElementById('bestFitEq').textContent =
+        `Best-fit: A = ${reg.slope.toExponential(3)} × c ${sign} ${Math.abs(reg.intercept).toFixed(4)}   |   R² = ${reg.r2.toFixed(5)}`;
+    }
+  } else {
+    document.getElementById('statSlope').textContent='—';
+    document.getElementById('statIntercept').textContent='—';
+    document.getElementById('statR2').textContent='—';
+    document.getElementById('bestFitEq').textContent='';
+  }
+
+  // Draw data points on top
+  pts.forEach(p=>{
+    const cx=toCanvasX(p.x), cy=toCanvasY(p.y);
+    if(cx<pad.l-10||cx>pad.l+pw+10||cy<pad.t-10||cy>pad.t+ph+10) return;
+    const col=SUB_COLORS[p.sub]||'#1565C0';
+    ctx.fillStyle=col; ctx.strokeStyle='#fff'; ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.arc(cx,cy,5,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    // Crosshair
+    ctx.strokeStyle=col; ctx.lineWidth=0.8; ctx.globalAlpha=0.4;
+    ctx.beginPath(); ctx.moveTo(cx,pad.t); ctx.lineTo(cx,pad.t+ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(pad.l,cy); ctx.lineTo(pad.l+pw,cy); ctx.stroke();
+    ctx.globalAlpha=1;
+  });
+
+  // Empty state
+  if(pts.length===0){
+    ctx.fillStyle='#aabbcc'; ctx.font='14px DM Sans'; ctx.textAlign='center';
+    ctx.fillText('No data to plot. Capture data points in the Simulator tab.', pad.l+pw/2, pad.t+ph/2);
+  }
+
+  // Legend
+  const subs=[...new Set(data.map(d=>d.sub))];
+  if(subs.length>0){
+    let legX=pad.l+pw-10, legY=pad.t+14;
+    subs.forEach(s=>{
+      const col=SUB_COLORS[s];
+      const nm=SUBSTANCES[s]?.shortName||s;
+      const tw=ctx.measureText(nm).width;
+      ctx.fillStyle=col; ctx.beginPath(); ctx.arc(legX-tw-16,legY,5,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#334'; ctx.font='11px DM Sans'; ctx.textAlign='right';
+      ctx.fillText(nm, legX, legY+4);
+      legY+=18;
+    });
+  }
+}
+
+function autoScale(){
+  const data=getCalData();
+  if(data.length===0) return;
+  const xs=data.map(d=>d.c), ys=data.map(d=>d.A);
+  const xMin=0, xMax=Math.max(...xs)*1.2||0.002;
+  const yMin=0, yMax=Math.max(...ys)*1.2||3;
+  document.getElementById('cfgXMin').value=xMin;
+  document.getElementById('cfgXMax').value=parseFloat(xMax.toExponential(2));
+  document.getElementById('cfgYMin').value=yMin;
+  document.getElementById('cfgYMax').value=parseFloat(yMax.toFixed(2));
+  // Set step
+  document.getElementById('cfgXStep').value=parseFloat((xMax/8).toExponential(2));
+  document.getElementById('cfgYStep').value=parseFloat((yMax/8).toFixed(2));
+  redrawCal();
+}
+
+function exportCalPNG(){
+  const canvas=document.getElementById('calCanvas');
+  const a=document.createElement('a');
+  a.href=canvas.toDataURL('image/png');
+  a.download='calibration_curve.png'; a.click();
+}
+
+// ══════════════════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════════════════
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='calibration') redrawCal();
+    if(btn.dataset.tab==='simulator'){drawInstrument();drawSpectrum();}
+  });
+});
+
+// ── Collapsibles ──
+function toggleColl(id){
+  const el=document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+// ── Theme ──
+const themeBtn=document.getElementById('themeBtn');
+themeBtn.addEventListener('click',()=>{
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme',isDark?'light':'dark');
+  themeBtn.textContent=isDark?'🌙 Dark':'☀️ Light';
+  redrawCal();
+});
+
+// ══════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════
+function init(){
+  onSubstanceChange();
+  drawInstrument();
+  drawSpectrum();
+  redrawCal();
+  // Resize cal canvas
+  window.addEventListener('resize',()=>{
+    const w=document.querySelector('.cal-canvas-wrap');
+    if(w){
+      const aw=w.clientWidth-32;
+      const cal=document.getElementById('calCanvas');
+      cal.style.width=aw+'px';
+      cal.style.height=(aw*560/900)+'px';
+    }
+    redrawCal();
+  });
+}
+init();
+</script>
+</body>
+</html>
