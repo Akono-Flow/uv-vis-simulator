@@ -1459,36 +1459,46 @@ function redrawCal(){
   ctx.fillStyle='#f5f5f0'; ctx.fillRect(pad.l+pw,0,W-(pad.l+pw),H);
 
   // ── Lab graph paper grid ──
+  // Major lines are drawn at exactly the same data positions as the tick labels.
+  // Minor lines subdivide each major interval into 5 equal parts.
+  // This guarantees perfect alignment between grid lines and axis numbers.
   if(showGrid){
-    // We tile a fixed pixel grid within the plot area (not data-driven)
-    // Minor cell = 4px wide; major block every 5 minor cells = 20px
-    // This gives the exact physical graph paper look from the image
-    const minorPx = 10;   // pixels per minor square
-    const majorEvery = 5; // major line every N minor lines
+    const minorDivisions = 5; // minor cells per major interval
 
-    // Minor gridlines — very thin, light grey like the image
+    // ── Minor gridlines — thin, light grey ──
     ctx.strokeStyle='rgba(100,100,100,0.18)';
     ctx.lineWidth=0.4;
-    // Vertical minor lines
-    for(let x=pad.l; x<=pad.l+pw; x+=minorPx){
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+ph); ctx.stroke();
+
+    // Vertical minor lines (X axis)
+    const xMinorStep = xStep / minorDivisions;
+    for(let v=xMin; v<=xMax+xMinorStep*0.01; v+=xMinorStep){
+      const x=toCanvasX(v);
+      if(x<pad.l-0.5||x>pad.l+pw+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
     }
-    // Horizontal minor lines
-    for(let y=pad.t; y<=pad.t+ph; y+=minorPx){
-      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+pw, y); ctx.stroke();
+    // Horizontal minor lines (Y axis)
+    const yMinorStep = yStep / minorDivisions;
+    for(let v=yMin; v<=yMax+yMinorStep*0.01; v+=yMinorStep){
+      const y=toCanvasY(v);
+      if(y<pad.t-0.5||y>pad.t+ph+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
     }
 
-    // Major gridlines — bold black like the image (every 5 minor = every 50px)
-    const majorPx = minorPx * majorEvery;
+    // ── Major gridlines — bold black, at every xStep / yStep (same as tick labels) ──
     ctx.strokeStyle='rgba(10,10,10,0.75)';
     ctx.lineWidth=1.1;
+
     // Vertical major lines
-    for(let x=pad.l; x<=pad.l+pw+1; x+=majorPx){
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+ph); ctx.stroke();
+    for(let v=xMin; v<=xMax+xStep*0.01; v+=xStep){
+      const x=toCanvasX(v);
+      if(x<pad.l-0.5||x>pad.l+pw+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(x,pad.t); ctx.lineTo(x,pad.t+ph); ctx.stroke();
     }
     // Horizontal major lines
-    for(let y=pad.t; y<=pad.t+ph+1; y+=majorPx){
-      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+pw, y); ctx.stroke();
+    for(let v=yMin; v<=yMax+yStep*0.01; v+=yStep){
+      const y=toCanvasY(v);
+      if(y<pad.t-0.5||y>pad.t+ph+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l+pw,y); ctx.stroke();
     }
   }
 
