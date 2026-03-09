@@ -166,7 +166,7 @@ tr:hover td{background:var(--surface2)}
 .toggle input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
 .toggle-track::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
 .toggle input:checked+.toggle-track::after{left:18px}
-.cal-canvas-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column}
+.cal-canvas-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;display:flex;flex-direction:column;overflow-x:auto}
 .cal-canvas-wrap h3{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:12px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
 #calCanvas{border-radius:6px;cursor:crosshair;width:100%;background:#ffffff}
 .stat-box{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
@@ -1438,107 +1438,128 @@ function redrawCal(){
   const showGrid=document.getElementById('cfgGrid').checked;
   const showBFL=document.getElementById('cfgBFL').checked;
 
-  const pad={l:72,r:30,t:52,b:60};
-  const pw=W-pad.l-pad.r, ph=H-pad.t-pad.b;
+  const pad={l:72,r:40,t:52,b:60};
 
-  function toCanvasX(v){return pad.l+(v-xMin)/(xMax-xMin)*pw;}
-  function toCanvasY(v){return pad.t+ph-(v-yMin)/(yMax-yMin)*ph;}
-  function fromCanvasX(px){return xMin+(px-pad.l)/pw*(xMax-xMin);}
-  function fromCanvasY(py){return yMin+(pad.t+ph-py)/ph*(yMax-yMin);}
+  // Number of major intervals on each axis
+  const nXSteps = Math.round((xMax - xMin) / xStep) || 1;
+  const nYSteps = Math.round((yMax - yMin) / yStep) || 1;
 
-  // Store pad/range for mouse handler
-  canvas._pad=pad; canvas._xMin=xMin; canvas._xMax=xMax;
-  canvas._yMin=yMin; canvas._yMax=yMax; canvas._pw=pw; canvas._ph=ph;
+  // Cell size driven purely by the available height — keeps cells square
+  // and lets the canvas grow as wide as needed to fit all X cells
+  const phAvail = H - pad.t - pad.b;
+  const S = phAvail / nYSteps;
+
+  const pw = S * nXSteps;
+  const ph = S * nYSteps;   // == phAvail exactly
+
+  // Resize canvas width to fit all cells (height stays fixed at 560)
+  const requiredW = Math.ceil(pad.l + pw + pad.r);
+  if(canvas.width !== requiredW) canvas.width = requiredW;
+  const W2 = canvas.width;
+
+  const plotLeft = pad.l;
+  const plotTop  = pad.t;   // top-aligned; ph fills full available height
+
+  function toCanvasX(v){ return plotLeft + (v - xMin) / (xMax - xMin) * pw; }
+  function toCanvasY(v){ return plotTop  + ph - (v - yMin) / (yMax - yMin) * ph; }
+
+  // Store for mouse handler and pinInterpValues
+  canvas._pad = {l: plotLeft, t: plotTop};
+  canvas._xMin=xMin; canvas._xMax=xMax;
+  canvas._yMin=yMin; canvas._yMax=yMax;
+  canvas._pw=pw; canvas._ph=ph;
 
   // ── Cream/white lab paper background ──
-  ctx.fillStyle='#fefefe'; ctx.fillRect(0,0,W,H);
-  // Outer margin (off-white border like a physical sheet)
-  ctx.fillStyle='#f5f5f0'; ctx.fillRect(0,0,W,pad.t);
-  ctx.fillStyle='#f5f5f0'; ctx.fillRect(0,pad.t+ph,W,H-(pad.t+ph));
-  ctx.fillStyle='#f5f5f0'; ctx.fillRect(0,0,pad.l,H);
-  ctx.fillStyle='#f5f5f0'; ctx.fillRect(pad.l+pw,0,W-(pad.l+pw),H);
+  ctx.fillStyle='#fefefe'; ctx.fillRect(0,0,W2,H);
+  // Off-white outer margin (everything outside the plot rectangle)
+  ctx.fillStyle='#f5f5f0';
+  ctx.fillRect(0, 0, W2, plotTop);
+  ctx.fillRect(0, plotTop+ph, W2, H-(plotTop+ph));
+  ctx.fillRect(0, plotTop, plotLeft, ph);
+  ctx.fillRect(plotLeft+pw, plotTop, W2-(plotLeft+pw), ph);
 
   // ── Lab graph paper grid ──
   if(showGrid){
-    // We tile a fixed pixel grid within the plot area (not data-driven)
-    // Minor cell = 4px wide; major block every 5 minor cells = 20px
-    // This gives the exact physical graph paper look from the image
-    const minorPx = 10;   // pixels per minor square
-    const majorEvery = 5; // major line every N minor lines
+    const minorDivisions = 5;
 
-    // Minor gridlines — very thin, light grey like the image
+    // Minor gridlines — thin, light grey
     ctx.strokeStyle='rgba(100,100,100,0.18)';
     ctx.lineWidth=0.4;
-    // Vertical minor lines
-    for(let x=pad.l; x<=pad.l+pw; x+=minorPx){
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+ph); ctx.stroke();
+    const xMinorStep = xStep / minorDivisions;
+    for(let v=xMin; v<=xMax+xMinorStep*0.01; v+=xMinorStep){
+      const x=toCanvasX(v);
+      if(x<plotLeft-0.5||x>plotLeft+pw+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(x,plotTop); ctx.lineTo(x,plotTop+ph); ctx.stroke();
     }
-    // Horizontal minor lines
-    for(let y=pad.t; y<=pad.t+ph; y+=minorPx){
-      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+pw, y); ctx.stroke();
+    const yMinorStep = yStep / minorDivisions;
+    for(let v=yMin; v<=yMax+yMinorStep*0.01; v+=yMinorStep){
+      const y=toCanvasY(v);
+      if(y<plotTop-0.5||y>plotTop+ph+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(plotLeft,y); ctx.lineTo(plotLeft+pw,y); ctx.stroke();
     }
 
-    // Major gridlines — bold black like the image (every 5 minor = every 50px)
-    const majorPx = minorPx * majorEvery;
+    // Major gridlines — bold black, aligned with tick labels
     ctx.strokeStyle='rgba(10,10,10,0.75)';
     ctx.lineWidth=1.1;
-    // Vertical major lines
-    for(let x=pad.l; x<=pad.l+pw+1; x+=majorPx){
-      ctx.beginPath(); ctx.moveTo(x, pad.t); ctx.lineTo(x, pad.t+ph); ctx.stroke();
+    for(let v=xMin; v<=xMax+xStep*0.01; v+=xStep){
+      const x=toCanvasX(v);
+      if(x<plotLeft-0.5||x>plotLeft+pw+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(x,plotTop); ctx.lineTo(x,plotTop+ph); ctx.stroke();
     }
-    // Horizontal major lines
-    for(let y=pad.t; y<=pad.t+ph+1; y+=majorPx){
-      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l+pw, y); ctx.stroke();
+    for(let v=yMin; v<=yMax+yStep*0.01; v+=yStep){
+      const y=toCanvasY(v);
+      if(y<plotTop-0.5||y>plotTop+ph+0.5) continue;
+      ctx.beginPath(); ctx.moveTo(plotLeft,y); ctx.lineTo(plotLeft+pw,y); ctx.stroke();
     }
   }
 
-  // ── Plot border (bold outer frame like physical graph paper) ──
+  // ── Plot border ──
   ctx.strokeStyle='#222'; ctx.lineWidth=1.8;
-  ctx.strokeRect(pad.l, pad.t, pw, ph);
+  ctx.strokeRect(plotLeft, plotTop, pw, ph);
 
   // ── Axes ──
   ctx.strokeStyle='#111'; ctx.lineWidth=2.2;
-  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+ph+5); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(pad.l-5,pad.t+ph); ctx.lineTo(pad.l+pw,pad.t+ph); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(plotLeft,plotTop); ctx.lineTo(plotLeft,plotTop+ph+5); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(plotLeft-5,plotTop+ph); ctx.lineTo(plotLeft+pw,plotTop+ph); ctx.stroke();
 
   // ── X axis ticks + labels ──
-  ctx.fillStyle='#111'; ctx.font='11px DM Sans'; ctx.textAlign='center';
-  for(let v=xMin;v<=xMax+xStep*0.01;v+=xStep){
+  ctx.fillStyle='#111'; ctx.textAlign='center';
+  for(let v=xMin; v<=xMax+xStep*0.01; v+=xStep){
     const x=toCanvasX(v);
-    if(x<pad.l-1||x>pad.l+pw+1) continue;
+    if(x<plotLeft-1||x>plotLeft+pw+1) continue;
     ctx.strokeStyle='#111'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(x,pad.t+ph); ctx.lineTo(x,pad.t+ph+6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x,plotTop+ph); ctx.lineTo(x,plotTop+ph+6); ctx.stroke();
     let lbl;
     if(Math.abs(v)<1e-4&&v!==0) lbl=v.toExponential(1);
     else if(Math.abs(v)<0.01) lbl=(v*1000).toFixed(1)+'m';
     else lbl=v.toFixed(4).replace(/\.?0+$/,'');
     ctx.fillStyle='#111'; ctx.font='10px DM Sans';
-    ctx.fillText(lbl, x, pad.t+ph+18);
+    ctx.fillText(lbl, x, plotTop+ph+18);
   }
 
   // ── Y axis ticks + labels ──
   ctx.textAlign='right';
-  for(let v=yMin;v<=yMax+yStep*0.01;v+=yStep){
+  for(let v=yMin; v<=yMax+yStep*0.01; v+=yStep){
     const y=toCanvasY(v);
-    if(y<pad.t-1||y>pad.t+ph+1) continue;
+    if(y<plotTop-1||y>plotTop+ph+1) continue;
     ctx.strokeStyle='#111'; ctx.lineWidth=1.5;
-    ctx.beginPath(); ctx.moveTo(pad.l,y); ctx.lineTo(pad.l-6,y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(plotLeft,y); ctx.lineTo(plotLeft-6,y); ctx.stroke();
     ctx.fillStyle='#111'; ctx.font='10px DM Sans';
-    ctx.fillText(v.toFixed(2).replace(/\.?0+$/,''), pad.l-9, y+4);
+    ctx.fillText(v.toFixed(2).replace(/\.?0+$/,''), plotLeft-9, y+4);
   }
 
   // ── Axis labels ──
   ctx.fillStyle='#111'; ctx.font='bold 12px DM Sans'; ctx.textAlign='center';
-  ctx.fillText(xLabel, pad.l+pw/2, H-12);
+  ctx.fillText(xLabel, plotLeft+pw/2, H-10);
   ctx.save();
-  ctx.translate(16, pad.t+ph/2);
+  ctx.translate(13, plotTop+ph/2);
   ctx.rotate(-Math.PI/2);
   ctx.fillText(yLabel, 0, 0);
   ctx.restore();
 
   // ── Title ──
   ctx.fillStyle='#111'; ctx.font='bold 14px Libre Baskerville,serif'; ctx.textAlign='center';
-  ctx.fillText(title, pad.l+pw/2, 28);
+  ctx.fillText(title, plotLeft+pw/2, 28);
 
   // ── Data ──
   const data=getCalData();
@@ -1591,39 +1612,32 @@ function redrawCal(){
   if(calProbe.active && calReg){
     const px=calProbe.canvasX, py=calProbe.canvasY;
     const probeA=calProbe.A, probeC=calProbe.c;
-    // Use darker, more visible colours on white paper
     const lineColor = calProbe.locked ? '#b71c1c' : '#e65100';
     const dashPattern = [6, 4];
 
-    // Clip to plot area
     ctx.save();
-    ctx.beginPath(); ctx.rect(pad.l, pad.t, pw, ph); ctx.clip();
-
-    // Horizontal dashed line: y-axis → intersection
+    ctx.beginPath(); ctx.rect(plotLeft, plotTop, pw, ph); ctx.clip();
     ctx.strokeStyle=lineColor; ctx.lineWidth=1.6; ctx.setLineDash(dashPattern);
-    ctx.beginPath(); ctx.moveTo(pad.l, py); ctx.lineTo(px, py); ctx.stroke();
-
-    // Vertical dashed line: intersection → x-axis
-    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, pad.t+ph); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(plotLeft, py); ctx.lineTo(px, py); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, plotTop+ph); ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
 
-    // Intersection dot — solid filled circle
     ctx.save();
     ctx.fillStyle=lineColor; ctx.strokeStyle='#fff'; ctx.lineWidth=2;
     ctx.beginPath(); ctx.arc(px,py,6,0,Math.PI*2); ctx.fill(); ctx.stroke();
     ctx.restore();
 
-    // A value label pill on Y-axis (left margin)
+    // A label on Y margin
     ctx.save();
-    const aLblY = Math.max(pad.t+10, Math.min(py, pad.t+ph-10));
+    const aLblY = Math.max(plotTop+10, Math.min(py, plotTop+ph-10));
     ctx.fillStyle=lineColor;
-    ctx.beginPath(); ctx.roundRect(2, aLblY-11, pad.l-5, 22, 5); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(2, aLblY-11, plotLeft-5, 22, 5); ctx.fill();
     ctx.fillStyle='#fff'; ctx.font='bold 10px IBM Plex Mono'; ctx.textAlign='center';
-    ctx.fillText(probeA.toFixed(4), (pad.l-2)/2, aLblY+4);
+    ctx.fillText(probeA.toFixed(4), (plotLeft-2)/2, aLblY+4);
     ctx.restore();
 
-    // c value label pill on X-axis (bottom margin)
+    // c label on X margin
     ctx.save();
     let cLabel;
     if(probeC<=0) cLabel='0';
@@ -1631,21 +1645,20 @@ function redrawCal(){
     else if(Math.abs(probeC)<0.001) cLabel=(probeC*1e6).toFixed(2)+'µ';
     else if(Math.abs(probeC)<0.01) cLabel=(probeC*1000).toFixed(3)+'m';
     else cLabel=probeC.toExponential(3);
-    const cLblX = Math.max(pad.l+36, Math.min(px, pad.l+pw-36));
+    const cLblX = Math.max(plotLeft+36, Math.min(px, plotLeft+pw-36));
     ctx.fillStyle=lineColor;
-    ctx.beginPath(); ctx.roundRect(cLblX-36, pad.t+ph+3, 72, 20, 5); ctx.fill();
+    ctx.beginPath(); ctx.roundRect(cLblX-36, plotTop+ph+3, 72, 20, 5); ctx.fill();
     ctx.fillStyle='#fff'; ctx.font='bold 10px IBM Plex Mono'; ctx.textAlign='center';
-    ctx.fillText(cLabel, cLblX, pad.t+ph+16);
+    ctx.fillText(cLabel, cLblX, plotTop+ph+16);
     ctx.restore();
 
-    // Lock / Pinned indicator badge (top-right of plot)
     if(calProbe.locked){
       ctx.save();
       ctx.fillStyle=lineColor; ctx.globalAlpha=0.9;
-      ctx.beginPath(); ctx.roundRect(pad.l+pw-96, pad.t+5, 94, 19, 4); ctx.fill();
+      ctx.beginPath(); ctx.roundRect(plotLeft+pw-96, plotTop+5, 94, 19, 4); ctx.fill();
       ctx.globalAlpha=1;
       ctx.fillStyle='#fff'; ctx.font='bold 10px IBM Plex Mono'; ctx.textAlign='center';
-      ctx.fillText('📌 PINNED', pad.l+pw-49, pad.t+17);
+      ctx.fillText('📌 PINNED', plotLeft+pw-49, plotTop+17);
       ctx.restore();
     }
   }
@@ -1653,36 +1666,26 @@ function redrawCal(){
   // ── Empty state ──
   if(pts.length===0){
     ctx.fillStyle='#aabbcc'; ctx.font='14px DM Sans'; ctx.textAlign='center';
-    ctx.fillText('No data to plot. Capture data in the Simulator tab or enter manual data below.', pad.l+pw/2, pad.t+ph/2);
+    ctx.fillText('No data to plot. Capture data in the Simulator tab or enter manual data below.', plotLeft+pw/2, plotTop+ph/2);
   }
 
-  // ── Legend — drawn in top margin, above the plot border ──
+  // ── Legend — top margin, right-aligned above the plot border ──
   const seenLabels = new Map();
   data.forEach(p=>{ if(!seenLabels.has(p.name)) seenLabels.set(p.name, p.color); });
   if(seenLabels.size > 0){
-    // Measure total width so we can right-align the block flush with the plot right edge
     ctx.font='11px DM Sans';
-    const entries = [...seenLabels.entries()];
-    // Build items: [{col, nm, tw}]
-    const items = entries.map(([nm,col])=>({nm, col, tw: ctx.measureText(nm).width}));
-    // Stack vertically in top margin, right-aligned to plot right edge
-    // Top margin height = pad.t (52px); title takes ~32px, leaving ~20px
-    // Place entries just below the title text, right-aligned
-    const legRight = pad.l + pw; // right edge of plot
-    let legY = 42; // just below title baseline
+    const items = [...seenLabels.entries()].map(([nm,col])=>({nm, col, tw: ctx.measureText(nm).width}));
+    const legRight = plotLeft + pw;
+    let legY = 42;
     items.forEach(({nm,col,tw})=>{
       const pillW = tw + 22;
       const pillX = legRight - pillW;
-      // Pill background
       ctx.fillStyle='rgba(245,245,240,0.92)';
       ctx.beginPath(); ctx.roundRect(pillX, legY-9, pillW, 17, 4); ctx.fill();
-      ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.lineWidth=0.6;
-      ctx.stroke();
-      // Colour dot
+      ctx.strokeStyle='rgba(0,0,0,0.15)'; ctx.lineWidth=0.6; ctx.stroke();
       ctx.fillStyle=col;
       ctx.beginPath(); ctx.arc(pillX+9, legY, 4.5, 0, Math.PI*2); ctx.fill();
       ctx.strokeStyle='#555'; ctx.lineWidth=0.5; ctx.stroke();
-      // Label
       ctx.fillStyle='#111'; ctx.font='11px DM Sans'; ctx.textAlign='left';
       ctx.fillText(nm, pillX+18, legY+4);
       legY += 18;
@@ -2082,16 +2085,7 @@ function init(){
   // Wire up interactive probe
   initCalCanvasEvents();
   // Resize cal canvas
-  window.addEventListener('resize',()=>{
-    const w=document.querySelector('.cal-canvas-wrap');
-    if(w){
-      const aw=w.clientWidth-32;
-      const cal=document.getElementById('calCanvas');
-      cal.style.width=aw+'px';
-      cal.style.height=(aw*560/900)+'px';
-    }
-    redrawCal();
-  });
+  window.addEventListener('resize', ()=>{ redrawCal(); });
 }
 init();
 </script>
