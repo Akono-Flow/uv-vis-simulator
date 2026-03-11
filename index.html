@@ -4564,7 +4564,7 @@
 
       function applyFontSize(size) {
         currentFontSize = Math.min(FONT_MAX, Math.max(FONT_MIN, size));
-        document.documentElement.style.fontSize = currentFontSize + "px";
+        document.body.style.zoom = currentFontSize / 14;
         document.getElementById("fontDecBtn").disabled = currentFontSize <= FONT_MIN;
         document.getElementById("fontIncBtn").disabled = currentFontSize >= FONT_MAX;
       }
