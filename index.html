@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>UV-VIS Spectroscopy Lab · CAPE Chemistry</title>
+    <!-- SCQ Auth System — add these in this order -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="https://akono-gate-flow.learnwithcole.com/js/config.js"></script>
+    <script src="https://akono-gate-flow.learnwithcole.com/js/auth.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -1450,6 +1454,15 @@
     </style>
   </head>
   <body>
+    <div id="page-loader" style="
+  position:fixed;inset:0;background:#050911;
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;font-family:monospace;color:#2563eb;font-size:1.1rem;
+  flex-direction:column;gap:12px;
+">
+  <span style="font-size:2rem">🔒</span>
+  Verifying access…
+</div>
     <header>
       <div class="logo">
         <div class="logo-icon">⚗️</div>
@@ -4596,7 +4609,17 @@
           redrawCal();
         });
       }
-      init();
+      document.addEventListener('DOMContentLoaded', async () => {
+        const auth = await requireAppAccess('uv-vis', 'no-access.html');
+        if (!auth) return;
+        document.getElementById('page-loader').remove();
+      
+        // ── All of your original code goes here ──
+        // (paste it in directly, no function needed)
+        init();
+      
+      });
+      // init();
     </script>
   </body>
 </html>
